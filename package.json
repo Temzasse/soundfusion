@@ -9,6 +9,7 @@
     "react-scripts": "1.0.7"
   },
   "dependencies": {
+    "pouchdb": "6.2.0",
     "react": "15.5.4",
     "react-dom": "15.5.4",
     "react-redux": "5.0.5",

@@ -15,8 +15,7 @@ const NavbarWrapper = styled.div`
   padding: 0px 32px;
   display: flex;
   align-items: center;
-  background-color: #000;
-  box-shadow: 0px 0px 18px rgba(0,0,0,0.4);
+  background-color: ${props => props.theme.primaryColorDark};
 `;
 
 export default Navbar;

@@ -1,52 +1,61 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import './App.css';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-import withApis from './components/withApis';
+// Actions
+import { setPlayer } from './features/player/player.ducks';
+
+// Components, views
+import withApis from './init/withApis';
 import Sidebar from './views/Sidebar';
 import Navbar from './views/Navbar';
 import CurrentPlaylist from './views/CurrentPlaylist';
-import ControlBar from './views/ControlBar';
+import ControlBar from './features/controls';
+
+const propTypes = {
+  setPlayer: PropTypes.func.isRequired,
+};
 
 class App extends Component {
-  state = {
-    searchTerm: '',
-  }
-
   componentDidMount() {
-    this.player = new window.YT.Player('player', {
+    // We now have access to the player APIs so create the different player objs
+    const ytPlayer = new window.YT.Player('player', {
       height: '360',
       width: '640',
     });
+
+    this.props.setPlayer({ name: 'youtube', player: ytPlayer });
   }
 
-  play = () => {
-    this.player.playVideo();
-  };
+  // play = () => {
+  //   this.player.playVideo();
+  // };
 
-  pause = () => {
-    this.player.pauseVideo();
-  };
+  // pause = () => {
+  //   this.player.pauseVideo();
+  // };
 
-  loadVideo = (videoId) => {
-    this.player.loadVideoById({ videoId });
-  };
+  // loadVideo = (videoId) => {
+  //   this.player.loadVideoById({ videoId });
+  // };
 
-  handleSearch = ({ target }) => {
-    const searchTerm = target.value;
+  // handleSearch = ({ target }) => {
+  //   const searchTerm = target.value;
 
-    this.setState({ searchTerm });
+  //   this.setState({ searchTerm });
 
-    if (searchTerm.length > 3) {
-      this.props.youtubeApi.search.list({
-        q: searchTerm,
-        part: 'snippet',
-      }).execute(({ result }) => {
-        const video = result.items[0];
-        this.loadVideo(video.id.videoId);
-      });
-    }
-  };
+  //   if (searchTerm.length > 3) {
+  //     this.props.youtubeApi.search.list({
+  //       q: searchTerm,
+  //       part: 'snippet',
+  //     }).execute(({ result }) => {
+  //       const video = result.items[0];
+  //       this.loadVideo(video.id.videoId);
+  //     });
+  //   }
+  // };
 
   render() {
     return (
@@ -70,17 +79,6 @@ class App extends Component {
   value={this.state.searchTerm || ''}
   onChange={this.handleSearch}
 />
-
-<Controls>
-  <ControlIcon
-    className='mdi mdi-play-circle-outline'
-    onClick={this.play}
-  />
-  <ControlIcon
-    className='mdi mdi-pause-circle-outline'
-    onClick={this.pause}
-  />
-</Controls>
 */
 
 const AppWrapper = styled.div`
@@ -100,29 +98,24 @@ const MainContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  box-shadow: 0px -4px 18px rgba(0,0,0,0.3);
 `;
 
-// const Controls = styled.div`
-//   display: flex;
-//   flex-direction: row;
-//   align-items: center;
-//   width: 100%;
-//   margin-top: 100px;
-// `;
+App.propTypes = propTypes;
 
-// const ControlIcon = styled.i`
-//   font-size: 60px;
-//   color: #222;
-//   margin: 0 16px;
-// `;
+function mapStateToProps(state) {
+  return {};
+}
 
-// const Search = styled.input`
-//   font-size: 16px;
-//   color: #222;
-//   padding: 8px 16px;
-//   border: 1px solid #ccc;
-//   background-color: #f5f5f5;
-//   border-radius: 6px;
-// `;
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    setPlayer,
+  }, dispatch)
+}
 
-export default withApis(App);
+export default withApis(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(App)
+);

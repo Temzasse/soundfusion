@@ -9,12 +9,18 @@
     "react-scripts": "1.0.7"
   },
   "dependencies": {
+    "color": "1.0.3",
+    "immutability-helper": "2.2.3",
     "pouchdb": "6.2.0",
+    "prop-types": "15.5.10",
     "react": "15.5.4",
     "react-dom": "15.5.4",
     "react-redux": "5.0.5",
     "react-router-dom": "4.1.1",
     "redux": "3.6.0",
+    "redux-actions": "2.2.1",
+    "redux-logger": "3.0.6",
+    "redux-saga": "0.15.4",
     "styled-components": "2.0.0"
   },
   "scripts": {

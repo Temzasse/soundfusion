@@ -11,7 +11,7 @@ const CurrentPlaylist = () => {
 
 const CurrentPlaylistWrapper = styled.div`
   flex: 1;
-  background-color: #888;
+  background-color: ${props => props.theme.primaryColorDarker};
   color: #fff;
 `;
 

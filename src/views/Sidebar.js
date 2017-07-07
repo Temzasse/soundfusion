@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const Sidebar = () => {
   return (
     <SidebarWrapper>
-      <Title>Awesomefy</Title>
+      <Title>Quantum</Title>
       <Playlists />
     </SidebarWrapper>
   );
@@ -12,14 +12,14 @@ const Sidebar = () => {
 
 const SidebarWrapper = styled.div`
   width: 300px;
-  background-color: #222;
+  background-color: ${props => props.theme.primaryColorDarkest};
   color: #fff;
   display: flex;
   flex-direction: column;
 `;
 
 const Playlists = styled.div`
-  background-color: #222;
+  flex: 1;
 `;
 
 const Title = styled.h1`
@@ -31,7 +31,7 @@ const Title = styled.h1`
   text-transform: uppercase;
   color: #fff;
   margin: 0;
-  background-color: #111;
+  background-color: ${props => props.theme.primaryColorDark};
 `;
 
 export default Sidebar;

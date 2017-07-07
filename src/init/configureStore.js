@@ -2,15 +2,24 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { fork } from 'redux-saga/effects';
 import player, { playerSagas } from '../features/player/player.ducks';
+import playlist, { playlistSagas } from '../features/playlist/playlist.ducks';
+// import track, { trackSagas } from '../features/track/track.ducks';
+import init, { initSagas } from './init.ducks';
 
 // Create root reducer
 const rootReducer = combineReducers({
+  init,
   player,
+  playlist,
+  // track,
 });
 
 // Create root saga
-function* rootSaga() {
+function * rootSaga() {
+  yield fork(initSagas);
   yield fork(playerSagas);
+  yield fork(playlistSagas);
+  // yield fork(trackSagas);
 }
 
 const sagaMiddleware = createSagaMiddleware();

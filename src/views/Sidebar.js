@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Playlists from '../features/playlist';
 
 const Sidebar = () => {
   return (
@@ -16,10 +17,6 @@ const SidebarWrapper = styled.div`
   color: #fff;
   display: flex;
   flex-direction: column;
-`;
-
-const Playlists = styled.div`
-  flex: 1;
 `;
 
 const Title = styled.h1`

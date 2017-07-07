@@ -39,18 +39,18 @@ class ControlsContainer extends Component {
           {isPlaying
             ? <ControlIcon
                 className="mdi mdi-pause-circle-outline"
-                onClick={this.props.pause}
+                onClick={() => this.props.pause()}
                 size='56px'
               />
             : <ControlIcon
                 className="mdi mdi-play-circle-outline"
-                onClick={this.props.play}
+                onClick={() => this.props.play()}
                 size='56px'
               />}
 
           <ControlIcon
             className="mdi mdi-skip-next"
-            onClick={this.props.nextTrack}
+            onClick={() => this.props.nextTrack()}
           />
         </Controls>
 
@@ -67,6 +67,7 @@ const ControlsWrapper = styled.div`
   box-shadow: -2px 0px 18px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 
 const Controls = styled.div`
@@ -74,7 +75,7 @@ const Controls = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
+  margin: 8px 0px;
 `;
 
 const ControlIcon = styled.i`

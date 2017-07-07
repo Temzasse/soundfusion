@@ -2,7 +2,6 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
-import { deletePlaylist as dp } from '../../init/db';
 
 // Action types
 export const PLAYER = createTypes('PLAYER', [

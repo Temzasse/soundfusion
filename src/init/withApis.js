@@ -53,7 +53,7 @@ const withApis = (Comp) => {
       const { youtubeApiLoaded, youtubePlayerLoaded } = this.state;
       const ready = youtubeApiLoaded && youtubePlayerLoaded;
 
-      if (!ready) return <div>Ladataan...</div>;
+      if (!ready) return null;
       
       return <Comp {...this.props} youtubeApi={window.gapi.client.youtube} />;
     }

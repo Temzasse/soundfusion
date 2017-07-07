@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 
 // Actions
 import { setPlayer } from './features/player/player.ducks';
+import { initApp, getInitStatus } from './init/init.ducks';
 
 // Components, views
 import withApis from './init/withApis';
@@ -20,6 +21,8 @@ const propTypes = {
 
 class App extends Component {
   componentDidMount() {
+    this.props.initApp();
+
     // We now have access to the player APIs so create the different player objs
     const ytPlayer = new window.YT.Player('player', {
       height: '360',
@@ -58,6 +61,10 @@ class App extends Component {
   // };
 
   render() {
+    const { appReady } = this.props;
+
+    if (!appReady) return <div>Ladataan...</div>;
+
     return (
       <AppWrapper className='App'>
         <MainWrapper>
@@ -104,11 +111,14 @@ const MainContent = styled.div`
 App.propTypes = propTypes;
 
 function mapStateToProps(state) {
-  return {};
+  return {
+    appReady: getInitStatus(state),
+  };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    initApp,
     setPlayer,
   }, dispatch)
 }

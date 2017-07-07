@@ -6,18 +6,22 @@ const propTypes = {
   something: PropTypes.any,
 };
 
-const formatTime = ms => ms / (60 * 1000);
+const msToMinAndSec = ms => {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = ((ms % 60000) / 1000).toFixed(0);
+  return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
+}
 
 const TrackTimeline = ({ duration, currentTime }) => (
   <TrackTimelineWrapper>
-    <TrackTime>{formatTime(currentTime)}</TrackTime>
+    <TrackTime>{msToMinAndSec(currentTime)}</TrackTime>
     <TrackDuration
       type='range'
       min='0'
       max={duration}
       step={1000}
     />
-    <TrackTime>{formatTime(duration)}</TrackTime>
+    <TrackTime>{msToMinAndSec(duration)}</TrackTime>
   </TrackTimelineWrapper>
 );
 
@@ -31,13 +35,14 @@ const TrackTime = styled.span`
 `;
 const TrackDuration = styled.input`
   width: 100%;
-  max-width: 500px;
+  min-width: 400px;
+  margin: 0 12px;
 `;
 
 
 TrackTimeline.propTypes = propTypes;
 TrackTimeline.defaultProps = {
-  duration: 1400000,
+  duration: 140000,
   currentTime: 13450,
 };
 

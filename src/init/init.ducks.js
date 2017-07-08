@@ -2,7 +2,7 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery, put } from 'redux-saga/effects';
 import { createTypes } from '../common/reduxHelpers';
-import { listPlaylists } from './db';
+import { listPlaylists } from '../services/db';
 import { initPlaylists } from '../features/playlist/playlist.ducks';
 
 // Action types

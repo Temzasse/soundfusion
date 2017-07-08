@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Playlists from '../features/playlist';
+import Playlists from '../features/playlist/list';
 
 const Sidebar = () => {
   return (

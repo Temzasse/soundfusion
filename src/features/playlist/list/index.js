@@ -7,8 +7,10 @@ import styled from 'styled-components';
 import {
   createPlaylist,
   deletePlaylist,
+  setActivePlaylist,
   getPlaylists,
-} from './playlist.ducks';
+  getActivePlaylist,
+} from '../playlist.ducks';
 
 // Components
 import CreatePlaylist from './CreatePlaylist';
@@ -25,8 +27,8 @@ class PlaylistsContainer extends Component {
   }
 
   render() {
-    const { playlists } = this.props;
-
+    const { playlists, activePlaylist } = this.props;
+    
     return (
       <PlaylistsWrapper>
         <CreatePlaylist
@@ -37,10 +39,11 @@ class PlaylistsContainer extends Component {
           {playlists.length > 0 ?
             playlists.map(({ name, _id }) => (
               <PlaylistItem
-                name={name}
-                handleDelete={() => this.props.deletePlaylist(_id)}
-                handleClick={() => this.props.deletePlaylist(_id)}
                 key={_id}
+                name={name}
+                active={!!activePlaylist && (activePlaylist._id === _id)}
+                handleDelete={() => this.props.deletePlaylist(_id)}
+                handleClick={() => this.props.setActivePlaylist(_id)}
               />
             )) :
             <NoPlaylists>You don't have any playlists yet</NoPlaylists>
@@ -74,6 +77,7 @@ PlaylistsContainer.propTypes = propTypes;
 function mapStateToProps(state) {
   return {
     playlists: getPlaylists(state),
+    activePlaylist: getActivePlaylist(state),
   };
 }
 
@@ -81,6 +85,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     createPlaylist,
     deletePlaylist,
+    setActivePlaylist,
   }, dispatch)
 }
 

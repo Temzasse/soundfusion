@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import Search from '../features/search';
 
 const Navbar = () => {
   return (
     <NavbarWrapper>
-      Navbar
+      <Search />
     </NavbarWrapper>
   );
 };
@@ -12,7 +13,6 @@ const Navbar = () => {
 const NavbarWrapper = styled.div`
   height: 60px;
   width: 100%;
-  padding: 0px 32px;
   display: flex;
   align-items: center;
   background-color: ${props => props.theme.primaryColorDark};

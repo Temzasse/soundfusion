@@ -3,7 +3,8 @@ import createSagaMiddleware from 'redux-saga';
 import { fork } from 'redux-saga/effects';
 import player, { playerSagas } from '../features/player/player.ducks';
 import playlist, { playlistSagas } from '../features/playlist/playlist.ducks';
-// import track, { trackSagas } from '../features/track/track.ducks';
+import track, { trackSagas } from '../features/track/track.ducks';
+import search, { searchSagas } from '../features/search/search.ducks';
 import init, { initSagas } from './init.ducks';
 
 // Create root reducer
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
   init,
   player,
   playlist,
-  // track,
+  track,
+  search,
 });
 
 // Create root saga
@@ -19,7 +21,8 @@ function * rootSaga() {
   yield fork(initSagas);
   yield fork(playerSagas);
   yield fork(playlistSagas);
-  // yield fork(trackSagas);
+  yield fork(trackSagas);
+  yield fork(searchSagas);
 }
 
 const sagaMiddleware = createSagaMiddleware();

@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb';
-window.PouchDB = PouchDB;
+
+window.PouchDB = PouchDB; // for PouchDB dev tools
 
 const playlistDB = new PouchDB('playlist');
 const trackDB = new PouchDB('track');
@@ -23,4 +24,17 @@ export async function listPlaylists() {
   });
   const playlists = rows.map(({ doc }) => doc);
   return playlists;
+};
+
+export async function listPlaylistTracks(id) {
+  const playlist = await playlistDB.get(id);
+  const { rows } = await trackDB.allDocs({
+    include_docs: true,
+    keys: playlist.tracks,
+  });
+
+  console.debug('[rows]', rows);
+  
+  const tracks = rows.map(({ doc }) => doc);
+  return tracks;
 };

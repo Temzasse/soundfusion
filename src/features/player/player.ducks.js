@@ -2,7 +2,6 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
-import { deletePlaylist as dp } from '../../init/db';
 
 // Action types
 export const PLAYER = createTypes('PLAYER', [
@@ -40,12 +39,13 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
+
 // Selectors
-export const getCurrentTrack = state => state.player.currentTrack;
-export const getPlayingStatus = state => state.player.isPlaying;
+export const getCurrentTrack = ({ player }) => player.currentTrack;
+export const getPlayingStatus = ({ player }) => player.isPlaying;
 export const getPlayerByName = (state, name) => state.player.players[name];
-export const getCurrentPlayer = state => {
-  return state.player.players[state.player.currentPlayer];
+export const getCurrentPlayer = ({ player }) => {
+  return player.players[player.currentPlayer];
 };
 
 

@@ -6,13 +6,14 @@ import { bindActionCreators } from 'redux';
 
 // Actions
 import { setPlayer } from './features/player/player.ducks';
+import { getActivePlaylist } from './features/playlist/playlist.ducks';
 import { initApp, getInitStatus } from './init/init.ducks';
 
 // Components, views
 import withApis from './init/withApis';
 import Sidebar from './views/Sidebar';
 import Navbar from './views/Navbar';
-import CurrentPlaylist from './views/CurrentPlaylist';
+import CurrentPlaylist from './features/playlist/details';
 import ControlBar from './features/controls';
 
 const propTypes = {
@@ -21,6 +22,7 @@ const propTypes = {
 
 class App extends Component {
   componentDidMount() {
+    // Do general initialization: load playlists etc...
     this.props.initApp();
 
     // We now have access to the player APIs so create the different player objs
@@ -44,24 +46,8 @@ class App extends Component {
   //   this.player.loadVideoById({ videoId });
   // };
 
-  // handleSearch = ({ target }) => {
-  //   const searchTerm = target.value;
-
-  //   this.setState({ searchTerm });
-
-  //   if (searchTerm.length > 3) {
-  //     this.props.youtubeApi.search.list({
-  //       q: searchTerm,
-  //       part: 'snippet',
-  //     }).execute(({ result }) => {
-  //       const video = result.items[0];
-  //       this.loadVideo(video.id.videoId);
-  //     });
-  //   }
-  // };
-
   render() {
-    const { appReady } = this.props;
+    const { appReady, activePlaylist } = this.props;
 
     if (!appReady) return <div>Ladataan...</div>;
 
@@ -72,7 +58,12 @@ class App extends Component {
 
           <MainContent>
             <Navbar />
-            <CurrentPlaylist />
+            <ContentWrapper>
+              {activePlaylist ?
+                <CurrentPlaylist /> :
+                <NoActivePlaylist>Choose playlist</NoActivePlaylist>
+              }
+            </ContentWrapper>
           </MainContent>
         </MainWrapper>
 
@@ -81,12 +72,6 @@ class App extends Component {
     );
   }
 }
-/*
-<Search
-  value={this.state.searchTerm || ''}
-  onChange={this.handleSearch}
-/>
-*/
 
 const AppWrapper = styled.div`
   height: 100vh;
@@ -94,18 +79,29 @@ const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
 const MainWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
 `;
-
 const MainContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
   box-shadow: 0px -4px 18px rgba(0,0,0,0.3);
+`;
+const ContentWrapper = styled.div`
+  flex: 1;
+  background: linear-gradient(
+    to bottom,
+    ${props => props.theme.primaryColorDark} 0%,
+    ${props => props.theme.primaryColorDarker} 100%
+  );
+  color: #fff;
+`;
+const NoActivePlaylist = styled.h4`
+  font-size: 24px;
+  margin: 16px;
 `;
 
 App.propTypes = propTypes;
@@ -113,6 +109,7 @@ App.propTypes = propTypes;
 function mapStateToProps(state) {
   return {
     appReady: getInitStatus(state),
+    activePlaylist: getActivePlaylist(state),
   };
 }
 

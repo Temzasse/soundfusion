@@ -6,11 +6,17 @@ const propTypes = {
   handleDelete: PropTypes.func.isRequired,
   handleClick: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
+  active: PropTypes.bool.isRequired,
 };
 
-const PlaylistItem = ({ name, handleDelete, handleClick }) => (
+const PlaylistItem = ({ name, handleDelete, handleClick, active }) => (
   <ItemWrapper>
-    <Name onClick={handleClick}>{name}</Name>
+    <Name
+      onClick={handleClick}
+      active={active}
+    >
+      {name}
+    </Name>
     <DeleteIcon className="mdi mdi-close-circle" onClick={handleDelete} />
   </ItemWrapper>
 );
@@ -22,7 +28,8 @@ const ItemWrapper = styled.div`
 `;
 const Name = styled.div`
   flex: 1;
-  opacity: 0.7;
+  opacity: ${props => props.active ? 1 : 0.7};
+  color: ${props => props.active ? props.theme.primaryColorLighter : '#fff'};
 
   &:hover {
     opacity: 1;

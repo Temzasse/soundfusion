@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const propTypes = {
-  something: PropTypes.any,
+  createPlaylist: PropTypes.func.isRequired,
 };
 
 class CreatePlaylist extends Component {

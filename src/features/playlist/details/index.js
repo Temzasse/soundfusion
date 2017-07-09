@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 
 import { getPlaylistTracks, getActivePlaylist } from '../playlist.ducks';
-import { play } from '../../player/player.ducks';
+import { setTrack } from '../../player/player.ducks';
 
 // Components
 import TracksList from './TracksList';
@@ -34,7 +34,7 @@ class PlaylistDetailsContainer extends Component {
           {playlistTracks.length > 0 ?
             <TracksList
               tracks={playlistTracks}
-              playTrack={this.props.play}
+              playTrack={this.props.setTrack}
             /> :
             <div>Add tracks by searching them with the input above.</div>
           }
@@ -83,7 +83,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    play,
+    setTrack,
   }, dispatch)
 }
 

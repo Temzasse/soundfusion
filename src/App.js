@@ -31,8 +31,6 @@ class App extends Component {
       width: '640',
     });
 
-    console.log(ytPlayer);
-
     this.props.setPlayer({ name: 'youtube', player: ytPlayer });
   }
 

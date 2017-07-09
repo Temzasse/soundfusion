@@ -5,11 +5,13 @@ import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 
 import {
-  getPlayingStatus,
   play,
   pause,
   nextTrack,
   prevTrack,
+  getPlayingStatus,
+  getCurrentPlayer,
+  getCurrentTrack,
 } from '../player/player.ducks';
 
 // Components
@@ -20,13 +22,48 @@ const propTypes = {
   pause: PropTypes.func.isRequired,
   nextTrack: PropTypes.func.isRequired,
   prevTrack: PropTypes.func.isRequired,
+  isPlaying: PropTypes.bool.isRequired,
+  currentPlayer: PropTypes.object,
+  currentTrack: PropTypes.object,
 };
 
 class ControlsContainer extends Component {
-  state = {};
+  state = {
+    currentTime: 0,
+    duration: 0,
+  };
+
+  componentWillMount() {
+    this.timeUpdater = setInterval(this.updateTrackTimeline, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timeUpdater);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.isPlaying && nextProps.isPlaying) {
+      // Start interval again when going from pause to play
+      clearInterval(this.timeUpdater);
+      this.timeUpdater = setInterval(this.updateTrackTimeline, 1000);
+    } else if (this.props.isPlaying && !nextProps.isPlaying) {
+      // Clear interval when going from play to pause
+      clearInterval(this.timeUpdater);
+    }
+  }
+
+  updateTrackTimeline = () => {
+    // Only update timeline if track is playing
+    if (this.props.isPlaying) {
+      const currentTime = this.props.currentPlayer.getCurrentTime();
+      const duration = this.props.currentPlayer.getDuration();
+      this.setState({ currentTime, duration });
+    }
+  }
 
   render() {
-    const { isPlaying } = this.props;
+    const { isPlaying, currentTrack } = this.props;
+    const { currentTime, duration } = this.state;
 
     return (
       <ControlsWrapper>
@@ -40,12 +77,12 @@ class ControlsContainer extends Component {
             ? <ControlIcon
                 className="mdi mdi-pause-circle-outline"
                 onClick={() => this.props.pause()}
-                size='56px'
+                size='40px'
               />
             : <ControlIcon
                 className="mdi mdi-play-circle-outline"
                 onClick={() => this.props.play()}
-                size='56px'
+                size='40px'
               />}
 
           <ControlIcon
@@ -54,7 +91,9 @@ class ControlsContainer extends Component {
           />
         </Controls>
 
-        <TrackTimeline />
+        {currentTrack &&
+          <TrackTimeline currentTime={currentTime} duration={duration} />
+        }
       </ControlsWrapper>
     );
   }
@@ -75,11 +114,11 @@ const Controls = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 8px 0px;
+  margin: 8px 0px 4px 0px;
 `;
 
 const ControlIcon = styled.i`
-  font-size: ${props => props.size || '40px'};
+  font-size: ${props => props.size || '24px'};
   color: #fff;
   margin: 0 16px;
 `;
@@ -98,6 +137,8 @@ ControlsContainer.propTypes = propTypes;
 function mapStateToProps(state) {
   return {
     isPlaying: getPlayingStatus(state),
+    currentPlayer: getCurrentPlayer(state),
+    currentTrack: getCurrentTrack(state),
   };
 }
 

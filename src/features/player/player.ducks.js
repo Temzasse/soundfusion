@@ -5,7 +5,7 @@ import { createTypes } from '../../common/reduxHelpers';
 
 // Action types
 export const PLAYER = createTypes('PLAYER', [
-  'PLAY', 'PAUSE', 'PREV_TRACK', 'NEXT_TRACK', 'SET_PLAYER',
+  'PLAY', 'PAUSE', 'PREV_TRACK', 'NEXT_TRACK', 'SET_PLAYER', 'SET_TRACK',
   'SET_CURRENT_PLAYER',
 ]);
 
@@ -14,13 +14,13 @@ export const play = createAction(PLAYER.PLAY);
 export const pause = createAction(PLAYER.PAUSE);
 export const prevTrack = createAction(PLAYER.PREV_TRACK);
 export const nextTrack = createAction(PLAYER.NEXT_TRACK);
+export const setTrack = createAction(PLAYER.SET_TRACK);
 export const setPlayer = createAction(PLAYER.SET_PLAYER);
 export const setCurrentPlayer = createAction(PLAYER.SET_CURRENT_PLAYER);
 
 // Reducers
 const initialState = {
   currentTrack: null,
-  currentPlayer: null,
   isPlaying: false,
   players: {
     youtube: null,
@@ -35,6 +35,19 @@ export default function reducer(state = initialState, action = {}) {
     return update(state, {
       players: { [action.payload.name]: { $set: action.payload.player } },
     });
+  case PLAYER.PLAY:
+    return update(state, {
+      isPlaying: { $set: !!state.currentTrack},
+    });
+  case PLAYER.SET_TRACK:
+    return update(state, {
+      currentTrack: { $set: action.payload },
+      isPlaying: { $set: true },
+    });
+  case PLAYER.PAUSE:
+    return update(state, {
+      isPlaying: { $set: false },
+    });
   default: return state;
   }
 }
@@ -45,44 +58,65 @@ export const getCurrentTrack = ({ player }) => player.currentTrack;
 export const getPlayingStatus = ({ player }) => player.isPlaying;
 export const getPlayerByName = (state, name) => state.player.players[name];
 export const getCurrentPlayer = ({ player }) => {
-  return player.players[player.currentPlayer];
-};
+  if (!player.currentTrack) return null;
+  return player.players[player.currentTrack.type];
+}
 
 
 // Sagas handlers
-function * playSaga({ payload: track }) {
+function * setTrackSaga({ payload: track }) {
   try {
-    console.log('[PLAY]', track);
-
     const player = yield select(getPlayerByName, track.type);
-    console.debug('[player]', player);
 
     if (track.type === 'youtube') {
       player.loadVideoById({ videoId: track.id, suggestedQuality: 'small' });
       player.playVideo();
     } else if (track.type === 'soundcloud') {
-      console.log('SOUNDCLOUD');
+      // TODO: handle soundcloud
     } else if (track.type === 'spotify') {
-      console.log('SPOTIFY');
+      // TODO: handle spotify
+    }
+  } catch (e) {
+    console.debug('[setTrackSaga] error', e);
+  }
+}
+
+function * playSaga() {
+  try {
+    const currentTrack = yield select(getCurrentTrack);
+    if (!currentTrack) return; // early exit
+
+    const player = yield select(getPlayerByName, currentTrack.type);
+
+    if (currentTrack.type === 'youtube') {
+      player.playVideo();
+    } else if (currentTrack.type === 'soundcloud') {
+      // TODO: handle soundcloud
+    } else if (currentTrack.type === 'spotify') {
+      // TODO: handle spotify
     }
   } catch (e) {
     console.debug('[playSaga] error', e);
   }
-  // play = () => {
-  //   this.player.playVideo();
-  // };
-
-  // pause = () => {
-  //   this.player.pauseVideo();
-  // };
-
-  // loadVideo = (videoId) => {
-  //   this.player.loadVideoById({ videoId });
-  // };
 }
 
-function * pauseSaga({ payload }) {
-  yield console.log('PAUSE', payload);
+function * pauseSaga() {
+  try {
+    const currentTrack = yield select(getCurrentTrack);
+    if (!currentTrack) return; // early exit
+
+    const player = yield select(getPlayerByName, currentTrack.type);
+
+    if (currentTrack.type === 'youtube') {
+      player.pauseVideo();
+    } else if (currentTrack.type === 'soundcloud') {
+      // TODO: handle soundcloud
+    } else if (currentTrack.type === 'spotify') {
+      // TODO: handle spotify
+    }
+  } catch (e) {
+    console.debug('[pauseSaga] error', e);
+  }
 }
 
 function * nextTrackSaga({ payload }) {
@@ -106,10 +140,14 @@ function * watchNextTrack() {
 function * watchPrevTrack() {
   yield takeEvery(PLAYER.PREV_TRACK, prevTrackSaga);
 }
+function * watchSetTrack() {
+  yield takeEvery(PLAYER.SET_TRACK, setTrackSaga);
+}
 
 export function * playerSagas() {
   yield fork(watchPlay);
   yield fork(watchPause);
   yield fork(watchNextTrack);
   yield fork(watchPrevTrack);
+  yield fork(watchSetTrack);
 }

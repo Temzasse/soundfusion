@@ -11,7 +11,7 @@ import {
   getSearchStatus,
 } from './search.ducks';
 
-import { getPlaylists } from '../playlist/playlist.ducks';
+import { getPlaylists, addTrackToPlaylist } from '../playlist/playlist.ducks';
 
 import SearchResults from './SearchResults';
 import PlaylistPicker from './PlaylistPicker';
@@ -54,6 +54,11 @@ class SearchContainer extends Component {
     this.setState({ selectedTrack: null });
   }
 
+  addTrackToPlaylist = playlist => {
+    const { selectedTrack } = this.state;
+    this.props.addTrackToPlaylist({ track: selectedTrack, playlist });
+  }
+
   render() {
     const { resultsVisible, selectedTrack } = this.state;
     const { searchTerm, isSearching, searchResults, playlists } = this.props;
@@ -89,7 +94,7 @@ class SearchContainer extends Component {
               <Panel>
                 <PlaylistPicker
                   playlists={playlists}
-                  handlePick={(playlist) => console.log(playlist)}
+                  handlePick={this.addTrackToPlaylist}
                   cancel={this.resetSelectedTrack}
                 />
               </Panel>
@@ -172,6 +177,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     updateSearchTerm,
+    addTrackToPlaylist,
   }, dispatch)
 }
 

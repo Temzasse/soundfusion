@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
-import { fork, takeEvery } from 'redux-saga/effects';
+import { fork, takeEvery, select } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
 
 // Action types
@@ -50,17 +50,35 @@ export const getCurrentPlayer = ({ player }) => {
 
 
 // Sagas handlers
-function * playSaga({ payload }) {
-  yield console.log('[PLAY]', payload);
-  // try {
-  //   yield put(searching(true));
-  //   yield delay(500);
-  //   yield put(receiveSearchResults(mockSearchResults));
-  //   yield put(searching(false));
-  // } catch (e) {
-  //   yield put(searching(false));
-  //   console.error(e);
-  // }
+function * playSaga({ payload: track }) {
+  try {
+    console.log('[PLAY]', track);
+
+    const player = yield select(getPlayerByName, track.type);
+    console.debug('[player]', player);
+
+    if (track.type === 'youtube') {
+      player.loadVideoById({ videoId: track.id, suggestedQuality: 'small' });
+      player.playVideo();
+    } else if (track.type === 'soundcloud') {
+      console.log('SOUNDCLOUD');
+    } else if (track.type === 'spotify') {
+      console.log('SPOTIFY');
+    }
+  } catch (e) {
+    console.debug('[playSaga] error', e);
+  }
+  // play = () => {
+  //   this.player.playVideo();
+  // };
+
+  // pause = () => {
+  //   this.player.pauseVideo();
+  // };
+
+  // loadVideo = (videoId) => {
+  //   this.player.loadVideoById({ videoId });
+  // };
 }
 
 function * pauseSaga({ payload }) {

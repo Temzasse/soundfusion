@@ -6,6 +6,15 @@ const playlistDB = new PouchDB('playlist');
 const trackDB = new PouchDB('track');
 const userDB = new PouchDB('user');
 
+// Helper
+function normalizePlaylist(playlist) {
+  return {
+    ...playlist,
+    tracks: playlist.tracks.map(t => t.id), // Just return the track ids
+  };
+}
+
+// Exported methods
 export async function deletePlaylist(id) {
   const playlist = await playlistDB.get(id);
   await playlistDB.remove(playlist);
@@ -19,22 +28,34 @@ export async function createPlaylist(name) {
 };
 
 export async function listPlaylists() {
-  const { rows } = await playlistDB.allDocs({
-    include_docs: true,
-  });
+  const { rows } = await playlistDB.allDocs({ include_docs: true });
   const playlists = rows.map(({ doc }) => doc);
   return playlists;
 };
 
 export async function listPlaylistTracks(id) {
   const playlist = await playlistDB.get(id);
-  const { rows } = await trackDB.allDocs({
-    include_docs: true,
-    keys: playlist.tracks,
-  });
+  return playlist.tracks;
+};
 
-  console.debug('[rows]', rows);
+export async function addTrackToPlaylist(track, playlistId) {
+  const playlist = await playlistDB.get(playlistId);
+
+  // Add new track
+  playlist.tracks.push(track);
+
+  await playlistDB.put(playlist); // Put back to db
+
+  return normalizePlaylist(playlist);
+};
+
+export async function removeTrackFromPlaylist(trackIndex, playlistId) {
+  const playlist = await playlistDB.get(playlistId);
+
+  // Remove track
+  playlist.tracks.splice(trackIndex, 1);
   
-  const tracks = rows.map(({ doc }) => doc);
-  return tracks;
+  await playlistDB.put(playlist); // Put back to db
+  
+  return normalizePlaylist(playlist);
 };

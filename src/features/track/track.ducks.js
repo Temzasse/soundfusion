@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery } from 'redux-saga/effects';
 import { createTypes, crudActions } from '../../common/reduxHelpers';
+import { PLAYLIST } from '../playlist/playlist.ducks';
 
 // Action types
 export const TRACK = createTypes('TRACK', [
@@ -10,6 +11,7 @@ export const TRACK = createTypes('TRACK', [
 
 // Export actions
 export const updateManyTracks = createAction(TRACK.UPDATE_MANY);
+export const receiveTracks = createAction(TRACK.RECEIVE);
 
 // Reducers
 const initialState = {
@@ -18,6 +20,10 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+  case TRACK.RECEIVE:
+    return update(state, {
+      tracksById: { $merge: action.payload },
+    });
   case TRACK.UPDATE:
     return update(state, {
       tracksById: { [action.payload._id]: { $set: action.payload } },
@@ -33,6 +39,10 @@ export default function reducer(state = initialState, action = {}) {
       tracksById: { $merge: newTracks },
     });
   }
+  case PLAYLIST.ADD_TRACK:
+    return update(state, {
+      tracksById: { [action.payload.track.id]: { $set: action.payload.track } },
+    });
   default: return state;
   }
 }

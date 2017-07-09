@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
+
 import { getPlaylistTracks, getActivePlaylist } from '../playlist.ducks';
+import { play } from '../../player/player.ducks';
+
+// Components
+import TracksList from './TracksList';
 
 const propTypes = {
   playlistTracks: PropTypes.array.isRequired,
@@ -27,7 +32,10 @@ class PlaylistDetailsContainer extends Component {
 
         <Tracks>
           {playlistTracks.length > 0 ?
-            <div>You have tracks</div> :
+            <TracksList
+              tracks={playlistTracks}
+              playTrack={this.props.play}
+            /> :
             <div>Add tracks by searching them with the input above.</div>
           }
         </Tracks>
@@ -44,6 +52,9 @@ const PlaylistDetailsWrapper = styled.div`
 const PlaylistInfo = styled.div`
   display: flex;
   flex-direction: column;
+  border-bottom: 2px solid ${props => props.theme.primaryColorDarkest};
+  padding-bottom: 8px;
+  margin-bottom: 8px;
 `;
 const Label = styled.div`
   font-size: 12px;
@@ -71,7 +82,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({}, dispatch)
+  return bindActionCreators({
+    play,
+  }, dispatch)
 }
 
 export default connect(

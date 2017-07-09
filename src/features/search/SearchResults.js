@@ -62,7 +62,7 @@ const TrackTitle = styled.div`
   margin-bottom: 4px;
 `;
 const TrackArtist = styled.div`
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 700;
 `;
 

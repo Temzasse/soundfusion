@@ -4,24 +4,28 @@ import { fork, takeEvery, put } from 'redux-saga/effects';
 
 import { createTypes, crudActions } from '../../common/reduxHelpers';
 import { updateManyTracks } from '../track/track.ducks';
+
+// Rename db methods so that they dont collide with actions
 import {
   deletePlaylist as deletePlaylistDB,
   createPlaylist as createPlaylistDB,
   listPlaylistTracks as listPlaylistTracksDB,
+  addTrackToPlaylist as addTrackToPlaylistDB,
 } from '../../services/db';
 
 // Action types
 export const PLAYLIST = createTypes('PLAYLIST', [
-  ...crudActions, 'INIT', 'SET_ACTIVE',
+  ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK',
 ]);
 
 // Export actions
-export const initPlaylists = createAction(PLAYLIST.INIT);
+export const receivePlaylists = createAction(PLAYLIST.RECEIVE);
 export const createPlaylist = createAction(PLAYLIST.CREATE);
 export const deletePlaylist = createAction(PLAYLIST.DELETE);
 export const updatePlaylist = createAction(PLAYLIST.UPDATE);
 export const listPlaylists = createAction(PLAYLIST.LIST);
 export const setActivePlaylist = createAction(PLAYLIST.SET_ACTIVE);
+export const addTrackToPlaylist = createAction(PLAYLIST.ADD_TRACK);
 
 // Reducers
 const initialState = {
@@ -31,15 +35,9 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-  case PLAYLIST.INIT:
-    const playlistsByIdNew = {};
-
-    action.payload.forEach(playlist => {
-      playlistsByIdNew[playlist._id] = playlist;
-    });
-
+  case PLAYLIST.RECEIVE:
     return update(state, {
-      playlistsById: { $set: playlistsByIdNew },
+      playlistsById: { $merge: action.payload },
     });
   case PLAYLIST.DELETE:
     return update(state, {
@@ -59,6 +57,14 @@ export default function reducer(state = initialState, action = {}) {
     return update(state, {
       activePlaylist: { $set: action.payload },
     });
+  case PLAYLIST.ADD_TRACK:
+    return update(state, {
+      playlistsById: {
+        [action.payload.playlist._id]: {
+          tracks: { $push: [action.payload.track.id] },
+        }
+      },
+    });
   default: return state;
   }
 }
@@ -74,7 +80,7 @@ export const getPlaylistTracks = ({ playlist, track }) => {
   if (!playlist.activePlaylist) return [];
 
   const activePlaylist = playlist.playlistsById[playlist.activePlaylist];
-  const tracks = activePlaylist.tracks.map(({ _id }) => track.tracksById[_id]);
+  const tracks = activePlaylist.tracks.map(tId => track.tracksById[tId]);
 
   return tracks;
 };
@@ -84,15 +90,27 @@ export const getPlaylistTracks = ({ playlist, track }) => {
 function * deletePlaylistSaga({ payload: id }) {
   yield deletePlaylistDB(id);
 }
+
 function * createPlaylistSaga({ payload: name }) {
   const playlist = yield createPlaylistDB(name);
   yield put(updatePlaylist(playlist));
 }
+
 // When playlist is set active we want to get all it's tracks from db
 function * setActiveSaga({ payload: id }) {
-  console.log('id', id);
   const tracks = yield listPlaylistTracksDB(id);
   yield put(updateManyTracks(tracks));
+}
+
+function * addTrackSaga({ payload }) {
+  try {
+    const { playlist, track } = payload;
+    console.log('----- 1', playlist, track);
+    // Add track to playlist in db first
+    yield addTrackToPlaylistDB(track, playlist._id);
+  } catch (e) {
+    console.debug('[addTrackSaga error]', e);
+  }
 }
 
 // Saga watchers
@@ -105,9 +123,13 @@ function * watchCreate() {
 function * watchActivation() {
   yield takeEvery(PLAYLIST.SET_ACTIVE, setActiveSaga);
 }
+function * watchAddTrack() {
+  yield takeEvery(PLAYLIST.ADD_TRACK, addTrackSaga);
+}
 
 export function * playlistSagas() {
   yield fork(watchDelete);
   yield fork(watchCreate);
   yield fork(watchActivation);
+  yield fork(watchAddTrack);
 }

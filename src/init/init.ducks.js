@@ -2,8 +2,9 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery, put } from 'redux-saga/effects';
 import { createTypes } from '../common/reduxHelpers';
-import { listPlaylists } from '../services/db';
-import { initPlaylists } from '../features/playlist/playlist.ducks';
+import { listPlaylists as listPlaylistsDB } from '../services/db';
+import { receivePlaylists } from '../features/playlist/playlist.ducks';
+import { receiveTracks } from '../features/track/track.ducks';
 
 // Action types
 export const INIT = createTypes('INIT', [
@@ -35,8 +36,21 @@ export const getInitStatus = state => state.init.initDone;
 
 // Sagas handlers
 function * initAppSaga() {
-  const playlists = yield listPlaylists();
-  yield put(initPlaylists(playlists));
+  const playlists = yield listPlaylistsDB();
+  const tracksById = {};
+  const playlistsById = {};
+
+  // Fill mappers with playlist and tracks data
+  playlists.forEach(p => {
+    playlistsById[p._id] = { ...p, tracks: p.tracks.map(t => t.id) };
+
+    p.tracks.forEach(t => {
+      if (!tracksById[t.id]) tracksById[t.id] = t;
+    });
+  });
+
+  yield put(receivePlaylists(playlistsById));
+  yield put(receiveTracks(tracksById));
   yield put(initDone());
 }
 

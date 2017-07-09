@@ -26,25 +26,15 @@ class App extends Component {
     this.props.initApp();
 
     // We now have access to the player APIs so create the different player objs
-    const ytPlayer = new window.YT.Player('player', {
+    const ytPlayer = new window.YT.Player('yt-player', {
       height: '360',
       width: '640',
     });
 
+    console.log(ytPlayer);
+
     this.props.setPlayer({ name: 'youtube', player: ytPlayer });
   }
-
-  // play = () => {
-  //   this.player.playVideo();
-  // };
-
-  // pause = () => {
-  //   this.player.pauseVideo();
-  // };
-
-  // loadVideo = (videoId) => {
-  //   this.player.loadVideoById({ videoId });
-  // };
 
   render() {
     const { appReady, activePlaylist } = this.props;
@@ -52,7 +42,7 @@ class App extends Component {
     if (!appReady) return <div>Ladataan...</div>;
 
     return (
-      <AppWrapper className='App'>
+      <AppWrapper className="App">
         <MainWrapper>
           <Sidebar />
 
@@ -92,12 +82,14 @@ const MainContent = styled.div`
 `;
 const ContentWrapper = styled.div`
   flex: 1;
+  color: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: linear-gradient(
     to bottom,
     ${props => props.theme.primaryColorDark} 0%,
     ${props => props.theme.primaryColorDarker} 100%
   );
-  color: #fff;
 `;
 const NoActivePlaylist = styled.h4`
   font-size: 24px;

@@ -3,3 +3,9 @@ body {
   padding: 0;
   font-family: 'Nunito', sans-serif;
 }
+#yt-player {
+  height: 0px;
+  width: 0px;
+  opacity: 0;
+  display: none;
+}

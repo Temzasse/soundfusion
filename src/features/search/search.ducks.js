@@ -59,8 +59,8 @@ export const getSearchResults = ({ search }) => search.results;
 
 // Sagas handlers
 function * searchSaga({ payload: searchTerm }) {
-  yield delay(200); // debounce search when user is typing
   yield put(setSearching(true));
+  yield delay(200); // debounce search when user is typing
 
   const youtubeSearch = getYoutubeSearchApi();
 
@@ -73,8 +73,6 @@ function * searchSaga({ payload: searchTerm }) {
   });
 
   const tracks = normalizeYoutubeResults(result);
-
-  console.log('RESULTS :::>', tracks);
 
   yield put(receiveSearchResults(tracks));
   yield put(setSearching(false));

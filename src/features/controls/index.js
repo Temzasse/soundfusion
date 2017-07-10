@@ -9,6 +9,7 @@ import {
   pause,
   nextTrack,
   prevTrack,
+  setTrackTime,
   getPlayingStatus,
   getCurrentPlayer,
   getCurrentTrack,
@@ -22,6 +23,7 @@ const propTypes = {
   pause: PropTypes.func.isRequired,
   nextTrack: PropTypes.func.isRequired,
   prevTrack: PropTypes.func.isRequired,
+  setTrackTime: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   currentPlayer: PropTypes.object,
   currentTrack: PropTypes.object,
@@ -44,12 +46,16 @@ class ControlsContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if (!this.props.isPlaying && nextProps.isPlaying) {
       // Start interval again when going from pause to play
-      clearInterval(this.timeUpdater);
-      this.timeUpdater = setInterval(this.updateTrackTimeline, 1000);
+      this.resetTimeUpdater();
     } else if (this.props.isPlaying && !nextProps.isPlaying) {
       // Clear interval when going from play to pause
       clearInterval(this.timeUpdater);
     }
+  }
+
+  resetTimeUpdater = () => {
+    clearInterval(this.timeUpdater);
+    this.timeUpdater = setInterval(this.updateTrackTimeline, 1000);
   }
 
   updateTrackTimeline = () => {
@@ -59,6 +65,10 @@ class ControlsContainer extends Component {
       const duration = this.props.currentPlayer.getDuration();
       this.setState({ currentTime, duration });
     }
+  }
+
+  setTrackTimeTmp = currentTime => {
+    this.setState({ currentTime });
   }
 
   render() {
@@ -77,12 +87,12 @@ class ControlsContainer extends Component {
             ? <ControlIcon
                 className="mdi mdi-pause-circle-outline"
                 onClick={() => this.props.pause()}
-                size='40px'
+                size="40px"
               />
             : <ControlIcon
                 className="mdi mdi-play-circle-outline"
                 onClick={() => this.props.play()}
-                size='40px'
+                size="40px"
               />}
 
           <ControlIcon
@@ -92,8 +102,12 @@ class ControlsContainer extends Component {
         </Controls>
 
         {currentTrack &&
-          <TrackTimeline currentTime={currentTime} duration={duration} />
-        }
+          <TrackTimeline
+            currentTime={currentTime}
+            duration={duration}
+            handleTimeChange={this.props.setTrackTime}
+            handleTimeSlide={this.setTrackTimeTmp}
+          />}
       </ControlsWrapper>
     );
   }
@@ -149,6 +163,7 @@ function mapDispatchToProps(dispatch) {
       pause,
       nextTrack,
       prevTrack,
+      setTrackTime,
     },
     dispatch
   );

@@ -12,25 +12,37 @@ const propTypes = {
 //   return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
 // }
 
-const processTime = seconds => {
+const formatTime = seconds => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds - mins * 60;
   const secsFormatted = secs < 10 ? `0${secs}` : secs;
   return `${mins}:${secsFormatted}`;
-}
+};
 
-const TrackTimeline = ({ duration, currentTime }) => (
+/**
+ * NOTE:
+ * `handleTimeChange` is triggered when the slider thumb STOPS!
+ * `handleTimeSlide` is triggers while the slider is MOVING!
+ */
+const TrackTimeline = ({
+  duration,
+  currentTime,
+  handleTimeChange,
+  handleTimeSlide,
+}) => (
   <TrackTimelineWrapper>
-    <TrackTime>{processTime(Math.floor(currentTime))}</TrackTime>
+    <TrackTime>{formatTime(Math.floor(currentTime))}</TrackTime>
     <TrackDuration
-      type='range'
+      type="range"
       step={1}
-      min='0'
+      min="0"
       max={Math.floor(duration)}
       value={Math.floor(currentTime)}
-      percentage={(currentTime / duration).toFixed(2)}
+      percentage={Math.round(currentTime / duration * 1000) / 1000}
+      onChange={({ target }) => handleTimeChange(target.value)}
+      onInput={({ target }) => handleTimeSlide(target.value)}
     />
-    <TrackTime>{processTime(Math.floor(duration))}</TrackTime>
+    <TrackTime>{formatTime(Math.floor(duration))}</TrackTime>
   </TrackTimelineWrapper>
 );
 
@@ -76,19 +88,19 @@ const TrackDuration = styled.input`
 
   &::-webkit-slider-thumb {
     appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: ${props => props.theme.primaryColorLighter};
     cursor: pointer;
-    transition: background .15s ease-in-out;
+    transition: background .15s ease-in-out, transform 0.2s ease;
 
     &:hover {
       background: ${props => props.theme.primaryColorLightest};
+      transform: scale(2.0);
     }
   }
 `;
-
 
 TrackTimeline.propTypes = propTypes;
 TrackTimeline.defaultProps = {

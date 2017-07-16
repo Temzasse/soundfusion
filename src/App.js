@@ -14,10 +14,14 @@ import withApis from './init/withApis';
 import Sidebar from './views/Sidebar';
 import Navbar from './views/Navbar';
 import CurrentPlaylist from './features/playlist/details';
-import ControlBar from './features/controls';
+import Controls from './features/controls';
+import TrackDetails from './features/track/details';
 
 const propTypes = {
   setPlayer: PropTypes.func.isRequired,
+  initApp: PropTypes.func.isRequired,
+  appReady: PropTypes.bool.isRequired,
+  activePlaylist: PropTypes.object,
 };
 
 class App extends Component {
@@ -55,7 +59,11 @@ class App extends Component {
           </MainContent>
         </MainWrapper>
 
-        <ControlBar />
+        <BottomBar>
+          <TrackDetails />
+          <Controls />
+          <div style={{ width: 300 }} />
+        </BottomBar>
       </AppWrapper>
     );
   }
@@ -92,6 +100,19 @@ const ContentWrapper = styled.div`
 const NoActivePlaylist = styled.h4`
   font-size: 24px;
   margin: 16px;
+`;
+const BottomBar = styled.div`
+  height: 100px;
+  color: #fff;
+  box-shadow: -2px 0px 18px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: linear-gradient(
+    to right,
+    ${props => props.theme.primaryColor} 0%,
+    ${props => props.theme.primaryColorDark} 100%
+  );
 `;
 
 App.propTypes = propTypes;

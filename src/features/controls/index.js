@@ -64,6 +64,11 @@ class ControlsContainer extends Component {
       const currentTime = this.props.currentPlayer.getCurrentTime();
       const duration = this.props.currentPlayer.getDuration();
       this.setState({ currentTime, duration });
+
+      if ((currentTime > 0 && duration > 0) && (currentTime > (duration - 2))) {
+        console.log(currentTime, duration);
+        // this.props.nextTrack();
+      }
     }
   }
 
@@ -80,7 +85,7 @@ class ControlsContainer extends Component {
         <Controls>
           <ControlIcon
             className="mdi mdi-skip-previous"
-            onClick={this.props.prevTrack}
+            onClick={() => this.props.prevTrack()}
           />
 
           {isPlaying
@@ -114,13 +119,11 @@ class ControlsContainer extends Component {
 }
 
 const ControlsWrapper = styled.div`
-  height: 100px;
-  background-color: ${props => props.theme.primaryColor};
-  color: #fff;
-  box-shadow: -2px 0px 18px rgba(0,0,0,0.3);
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 `;
 
 const Controls = styled.div`
@@ -135,6 +138,13 @@ const ControlIcon = styled.i`
   font-size: ${props => props.size || '24px'};
   color: #fff;
   margin: 0 16px;
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.3s ease-in;
+
+  &:hover {
+    transform: scale(1.1);
+    opacity: 1;
+  }
 `;
 
 const Search = styled.input`

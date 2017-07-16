@@ -1,8 +1,9 @@
 import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 // import { delay } from 'redux-saga';
-import { fork, takeEvery, select } from 'redux-saga/effects';
+import { fork, takeEvery, takeLatest, select, put } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
+import { getNextTrack, getPrevTrack } from '../playlist/playlist.ducks';
 
 // Action types
 export const PLAYER = createTypes('PLAYER', [
@@ -56,18 +57,19 @@ export default function reducer(state = initialState, action = {}) {
 
 
 // Selectors
-export const getCurrentTrack = ({ player }) => player.currentTrack;
 export const getPlayingStatus = ({ player }) => player.isPlaying;
 export const getPlayerByName = (state, name) => state.player.players[name];
+export const getCurrentTrack = ({ player }) => player.currentTrack;
 export const getCurrentPlayer = ({ player }) => {
   if (!player.currentTrack) return null;
-  return player.players[player.currentTrack.type];
+  return player.players[player.currentTrack.track.type];
 }
 
 
 // Sagas handlers
-function * setTrackSaga({ payload: track }) {
+function * setTrackSaga({ payload }) {
   try {
+    const { track } = payload;
     const player = yield select(getPlayerByName, track.type);
 
     if (track.type === 'youtube') {
@@ -87,14 +89,15 @@ function * playSaga() {
   try {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
+    
+    const trackType = currentTrack.track.type;
+    const player = yield select(getPlayerByName, trackType);
 
-    const player = yield select(getPlayerByName, currentTrack.type);
-
-    if (currentTrack.type === 'youtube') {
+    if (trackType === 'youtube') {
       player.playVideo();
-    } else if (currentTrack.type === 'soundcloud') {
+    } else if (trackType === 'soundcloud') {
       // TODO: handle soundcloud
-    } else if (currentTrack.type === 'spotify') {
+    } else if (trackType === 'spotify') {
       // TODO: handle spotify
     }
   } catch (e) {
@@ -107,13 +110,14 @@ function * pauseSaga() {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
 
-    const player = yield select(getPlayerByName, currentTrack.type);
+    const trackType = currentTrack.track.type;
+    const player = yield select(getPlayerByName, trackType);
 
-    if (currentTrack.type === 'youtube') {
+    if (trackType === 'youtube') {
       player.pauseVideo();
-    } else if (currentTrack.type === 'soundcloud') {
+    } else if (trackType === 'soundcloud') {
       // TODO: handle soundcloud
-    } else if (currentTrack.type === 'spotify') {
+    } else if (trackType === 'spotify') {
       // TODO: handle spotify
     }
   } catch (e) {
@@ -121,27 +125,63 @@ function * pauseSaga() {
   }
 }
 
-function * nextTrackSaga({ payload }) {
-  yield console.log('NEXT', payload);
-}
-
-function * prevTrackSaga({ payload }) {
-  yield console.log('PREV', payload);
-}
-
-function * setTrackTimeSaga({ payload: newTime }) {
-  // yield delay(400);
+function * nextTrackSaga() {
   try {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
 
-    const player = yield select(getPlayerByName, currentTrack.type);
+    const nextTrack = yield select(
+      getNextTrack,
+      currentTrack.playlistId,
+      currentTrack.index
+    );
+    if (!nextTrack) return; // early exit
 
-    if (currentTrack.type === 'youtube') {
+    yield put(setTrack({
+      track: nextTrack,
+      playlistId: currentTrack.playlistId,
+      index: currentTrack.index + 1,
+    }));
+  } catch (e) {
+    console.debug('[nextTrackSaga] error', e);
+  }
+}
+
+function * prevTrackSaga() {
+  try {
+    const currentTrack = yield select(getCurrentTrack);
+    if (!currentTrack) return; // early exit
+
+    const prevTrack = yield select(
+      getPrevTrack,
+      currentTrack.playlistId,
+      currentTrack.index
+    );
+    if (!prevTrack) return; // early exit
+
+    yield put(setTrack({
+      track: prevTrack,
+      playlistId: currentTrack.playlistId,
+      index: currentTrack.index - 1,
+    }));
+  } catch (e) {
+    console.debug('[nextTrackSaga] error', e);
+  }
+}
+
+function * setTrackTimeSaga({ payload: newTime }) {
+  try {
+    const currentTrack = yield select(getCurrentTrack);
+    if (!currentTrack) return; // early exit
+
+    const trackType = currentTrack.track.type;
+    const player = yield select(getPlayerByName, trackType);
+
+    if (trackType === 'youtube') {
       player.seekTo(newTime);
-    } else if (currentTrack.type === 'soundcloud') {
+    } else if (trackType === 'soundcloud') {
       // TODO: handle soundcloud
-    } else if (currentTrack.type === 'spotify') {
+    } else if (trackType === 'spotify') {
       // TODO: handle spotify
     }
   } catch (e) {
@@ -166,7 +206,7 @@ function * watchSetTrack() {
   yield takeEvery(PLAYER.SET_TRACK, setTrackSaga);
 }
 function * watchSetTrackTime() {
-  yield takeEvery(PLAYER.SET_TRACK_TIME, setTrackTimeSaga);
+  yield takeLatest(PLAYER.SET_TRACK_TIME, setTrackTimeSaga);
 }
 
 export function * playerSagas() {

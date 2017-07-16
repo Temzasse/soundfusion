@@ -84,6 +84,30 @@ export const getPlaylistTracks = ({ playlist, track }) => {
 
   return tracks;
 };
+export const getNextTrack = ({ playlist, track }, playlistId, trackIndex) => {
+  const currentPlaylist = playlist.playlistsById[playlistId];
+
+  // For some reason the playlist doesnt exist...
+  if (!currentPlaylist) return null;
+
+  // Current track is the last one in playlist
+  if (currentPlaylist.tracks.length - 1 < trackIndex + 1) return null;
+
+  const nextTrackId = currentPlaylist.tracks[trackIndex + 1];
+  return track.tracksById[nextTrackId];
+}
+export const getPrevTrack = ({ playlist, track }, playlistId, trackIndex) => {
+  const currentPlaylist = playlist.playlistsById[playlistId];
+
+  // For some reason the playlist doesnt exist...
+  if (!currentPlaylist) return null;
+
+  // Current track is the first one in playlist
+  if (trackIndex === 0) return null;
+
+  const prevTrackId = currentPlaylist.tracks[trackIndex - 1];
+  return track.tracksById[prevTrackId];
+}
 
 
 // Sagas handlers
@@ -105,7 +129,6 @@ function * setActiveSaga({ payload: id }) {
 function * addTrackSaga({ payload }) {
   try {
     const { playlist, track } = payload;
-    console.log('----- 1', playlist, track);
     // Add track to playlist in db first
     yield addTrackToPlaylistDB(track, playlist._id);
   } catch (e) {

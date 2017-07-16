@@ -34,6 +34,7 @@ class PlaylistDetailsContainer extends Component {
           {playlistTracks.length > 0 ?
             <TracksList
               tracks={playlistTracks}
+              playlistId={playlist._id}
               playTrack={this.props.setTrack}
             /> :
             <div>Add tracks by searching them with the input above.</div>

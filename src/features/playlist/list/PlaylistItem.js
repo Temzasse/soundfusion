@@ -29,7 +29,7 @@ const ItemWrapper = styled.div`
 const Name = styled.div`
   flex: 1;
   opacity: ${props => props.active ? 1 : 0.7};
-  color: ${props => props.active ? props.theme.primaryColorLighter : '#fff'};
+  color: ${props => props.active ? props.theme.primaryColorLight : '#fff'};
 
   &:hover {
     opacity: 1;

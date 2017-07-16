@@ -1,11 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import Playlists from '../features/playlist/list';
+import logo from '../quantum_logo.svg';
 
 const Sidebar = () => {
   return (
     <SidebarWrapper>
-      <Title>Quantum</Title>
+      <TitleBar>
+        <Logo src={logo} />
+        SoundFusion
+      </TitleBar>
       <Playlists />
     </SidebarWrapper>
   );
@@ -19,16 +23,23 @@ const SidebarWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Title = styled.h1`
+const TitleBar = styled.div`
   height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  font-size: 24px;
-  text-transform: uppercase;
-  color: #fff;
+  padding: 0px 16px;
   margin: 0;
+  font-size: 18px;
+  font-weight: 200;
+  color: #fff;
   background-color: ${props => props.theme.primaryColorDark};
 `;
+
+const Logo = styled.img`
+  height: 40px;
+  width: auto;
+  margin-right: 12px;
+`;
+
 
 export default Sidebar;

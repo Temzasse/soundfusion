@@ -5,9 +5,10 @@ import styled from 'styled-components';
 const propTypes = {
   tracks: PropTypes.array.isRequired,
   playTrack: PropTypes.func.isRequired,
+  playlistId: PropTypes.string.isRequired,
 };
 
-const TracksList = ({ tracks, playTrack }) => (
+const TracksList = ({ tracks, playTrack, playlistId }) => (
   <TracksListWrapper>
     <TracksHeader>
       <Title>Track</Title>
@@ -15,8 +16,11 @@ const TracksList = ({ tracks, playTrack }) => (
     </TracksHeader>
 
     <Tracks>
-      {tracks.map(track => (
-        <TrackRow onClick={() => playTrack(track)} key={track.id}>
+      {tracks.map((track, index) => (
+        <TrackRow
+          onClick={() => playTrack({ track, index, playlistId })}
+          key={track.id}
+        >
           <Title>{track.title}</Title>
           <Artist>{track.artist}</Artist>
         </TrackRow>
@@ -61,7 +65,6 @@ const Title = styled.div`
 const Artist = styled.div`
   flex: 2;
 `;
-
 
 TracksList.propTypes = propTypes;
 

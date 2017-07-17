@@ -59,16 +59,20 @@ class ControlsContainer extends Component {
   }
 
   updateTrackTimeline = () => {
+    const { isPlaying, currentPlayer } = this.props;
+
     // Only update timeline if track is playing
-    if (this.props.isPlaying) {
-      const currentTime = this.props.currentPlayer.getCurrentTime();
-      const duration = this.props.currentPlayer.getDuration();
+    if (isPlaying && !!currentPlayer) {      
+      const currentTime = currentPlayer.getCurrentTime();
+      const duration = currentPlayer.getDuration();
+
       this.setState({ currentTime, duration });
 
-      if ((currentTime > 0 && duration > 0) && (currentTime > (duration - 2))) {
-        console.log(currentTime, duration);
-        // this.props.nextTrack();
-      }
+      const trackAlmostDone =
+        (currentTime > 0 && duration > 0) &&
+        (currentTime > (duration - 2));
+
+      if (trackAlmostDone) this.props.nextTrack();
     }
   }
 

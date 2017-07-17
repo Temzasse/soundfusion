@@ -8,7 +8,7 @@ import { getNextTrack, getPrevTrack } from '../playlist/playlist.ducks';
 // Action types
 export const PLAYER = createTypes('PLAYER', [
   'PLAY', 'PAUSE', 'PREV_TRACK', 'NEXT_TRACK', 'SET_PLAYER', 'SET_TRACK',
-  'SET_CURRENT_PLAYER', 'SET_TRACK_TIME',
+  'SET_CURRENT_PLAYER', 'SET_TRACK_TIME', 'SET_CURRENT_TRACK',
 ]);
 
 // Export actions
@@ -17,6 +17,7 @@ export const pause = createAction(PLAYER.PAUSE);
 export const prevTrack = createAction(PLAYER.PREV_TRACK);
 export const nextTrack = createAction(PLAYER.NEXT_TRACK);
 export const setTrack = createAction(PLAYER.SET_TRACK);
+export const setCurrentTrack = createAction(PLAYER.SET_CURRENT_TRACK);
 export const setPlayer = createAction(PLAYER.SET_PLAYER);
 export const setCurrentPlayer = createAction(PLAYER.SET_CURRENT_PLAYER);
 export const setTrackTime = createAction(PLAYER.SET_TRACK_TIME);
@@ -42,7 +43,7 @@ export default function reducer(state = initialState, action = {}) {
     return update(state, {
       isPlaying: { $set: !!state.currentTrack},
     });
-  case PLAYER.SET_TRACK:
+  case PLAYER.SET_CURRENT_TRACK:
     return update(state, {
       currentTrack: { $set: action.payload },
       isPlaying: { $set: true },
@@ -70,16 +71,21 @@ export const getCurrentPlayer = ({ player }) => {
 function * setTrackSaga({ payload }) {
   try {
     const { track } = payload;
+
+    // Reset current player if there's a track playing
+    const currentPlayer = yield select(getCurrentPlayer);
+    console.log('=>', currentPlayer);
+    if (currentPlayer) currentPlayer.reset();
+
+    // Re-dispatch the correct action that changes the store
+    yield put(setCurrentTrack(payload));
+
+    // Get the player for the new track
     const player = yield select(getPlayerByName, track.type);
 
-    if (track.type === 'youtube') {
-      player.loadVideoById({ videoId: track.id, suggestedQuality: 'small' });
-      player.playVideo();
-    } else if (track.type === 'soundcloud') {
-      // TODO: handle soundcloud
-    } else if (track.type === 'spotify') {
-      // TODO: handle spotify
-    }
+    // Load and play the new track
+    yield player.load(track);
+    player.play();
   } catch (e) {
     console.debug('[setTrackSaga] error', e);
   }
@@ -93,13 +99,7 @@ function * playSaga() {
     const trackType = currentTrack.track.type;
     const player = yield select(getPlayerByName, trackType);
 
-    if (trackType === 'youtube') {
-      player.playVideo();
-    } else if (trackType === 'soundcloud') {
-      // TODO: handle soundcloud
-    } else if (trackType === 'spotify') {
-      // TODO: handle spotify
-    }
+    player.play();
   } catch (e) {
     console.debug('[playSaga] error', e);
   }
@@ -113,13 +113,7 @@ function * pauseSaga() {
     const trackType = currentTrack.track.type;
     const player = yield select(getPlayerByName, trackType);
 
-    if (trackType === 'youtube') {
-      player.pauseVideo();
-    } else if (trackType === 'soundcloud') {
-      // TODO: handle soundcloud
-    } else if (trackType === 'spotify') {
-      // TODO: handle spotify
-    }
+    player.pause();
   } catch (e) {
     console.debug('[pauseSaga] error', e);
   }
@@ -177,13 +171,7 @@ function * setTrackTimeSaga({ payload: newTime }) {
     const trackType = currentTrack.track.type;
     const player = yield select(getPlayerByName, trackType);
 
-    if (trackType === 'youtube') {
-      player.seekTo(newTime);
-    } else if (trackType === 'soundcloud') {
-      // TODO: handle soundcloud
-    } else if (trackType === 'spotify') {
-      // TODO: handle spotify
-    }
+    player.seek(newTime);
   } catch (e) {
     console.debug('[pauseSaga] error', e);
   }

@@ -23,3 +23,4 @@ export const theme = {
 };
 
 export const GOOGLE_API_KEY = '***REMOVED***';
+export const SOUNDCLOUD_CLIENT_ID = '***REMOVED***';

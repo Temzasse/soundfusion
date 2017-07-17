@@ -3,8 +3,11 @@ import { createAction } from 'redux-actions';
 import { fork, takeEvery, put } from 'redux-saga/effects';
 import { createTypes } from '../common/reduxHelpers';
 import { listPlaylists as listPlaylistsDB } from '../services/db';
+import { setPlayer } from '../features/player/player.ducks';
 import { receivePlaylists } from '../features/playlist/playlist.ducks';
 import { receiveTracks } from '../features/track/track.ducks';
+import YoutubePlayer from '../services/youtube';
+import SoundcloudPlayer from '../services/soundcloud';
 
 // Action types
 export const INIT = createTypes('INIT', [
@@ -35,7 +38,7 @@ export const getInitStatus = state => state.init.initDone;
 
 
 // Sagas handlers
-function * initAppSaga() {
+function * loadPlaylistsAndTracks() {
   const playlists = yield listPlaylistsDB();
   const tracksById = {};
   const playlistsById = {};
@@ -51,6 +54,19 @@ function * initAppSaga() {
 
   yield put(receivePlaylists(playlistsById));
   yield put(receiveTracks(tracksById));
+}
+
+function * setupPlayers() {
+  // We now have access to the player APIs so create the different player objs
+  const ytPlayer = new YoutubePlayer('yt-player');
+  const scPlayer = new SoundcloudPlayer();
+  yield put(setPlayer({ name: 'youtube', player: ytPlayer }));
+  yield put(setPlayer({ name: 'soundcloud', player: scPlayer }));
+}
+
+function * initAppSaga() {
+  yield setupPlayers();
+  yield loadPlaylistsAndTracks();
   yield put(initDone());
 }
 

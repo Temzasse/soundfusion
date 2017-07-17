@@ -2,13 +2,8 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { delay } from 'redux-saga';
 import { fork, takeLatest, put } from 'redux-saga/effects';
-
 import { createTypes, crudActions } from '../../common/reduxHelpers';
-
-import {
-  getYoutubeSearchApi,
-  normalizeYoutubeResults,
-} from '../../services/utils';
+import searchTracks from '../../services/search';
 
 // import {
 //   deletePlaylist as deletePlaylistDB,
@@ -62,17 +57,7 @@ function * searchSaga({ payload: searchTerm }) {
   yield put(setSearching(true));
   yield delay(200); // debounce search when user is typing
 
-  const youtubeSearch = getYoutubeSearchApi();
-
-  const { result } = yield youtubeSearch.list({
-    q: searchTerm,
-    part: 'snippet',
-    type: 'video',
-    videoCategoryId: 10, // 10 -> MUSIC
-    maxResults: 10,
-  });
-
-  const tracks = normalizeYoutubeResults(result);
+  const tracks = yield searchTracks(searchTerm);
 
   yield put(receiveSearchResults(tracks));
   yield put(setSearching(false));

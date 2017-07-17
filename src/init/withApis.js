@@ -1,14 +1,33 @@
 import React, { Component } from 'react';
-import { GOOGLE_API_KEY } from '../constants';
+import { GOOGLE_API_KEY, SOUNDCLOUD_CLIENT_ID } from '../constants';
 
 const withApis = (Comp) => {
   return class ApiProvider extends Component {
     state = {
       youtubeApiLoaded: false,
       youtubePlayerLoaded: false,
+      soundcloudSdkLoaded: false,
     };
 
     componentWillMount() {
+      this.startGApiLoader();
+      this.startYtLoader();
+      this.startSCLoader();
+    }
+
+    startSCLoader = () => {
+      if (!window.SC) {
+        this.soundcloudSdkLoader = setInterval(
+          this.checkIfSoundcloudSdkExists,
+          500
+        );
+      } else {
+        this.initSoundcloud();
+        this.setState({ soundcloudSdkLoaded: true });
+      }
+    };
+
+    startGApiLoader = () => {
       if (!window.gapi || !window.gapi.client) {
         this.googleApiLoader = setInterval(
           this.checkIfGoogleApiExists,
@@ -17,7 +36,9 @@ const withApis = (Comp) => {
       } else {
         this.loadYoutubeApi();
       }
+    };
 
+    startYtLoader = () => {
       if (!window.YT) {
         this.youtubePlayerApiLoader = setInterval(
           this.checkIfPlayerApiExists,
@@ -26,7 +47,7 @@ const withApis = (Comp) => {
       } else {
         this.setState({ youtubePlayerLoaded: true });
       }
-    }
+    };
 
     checkIfGoogleApiExists = () => {
       if (window.gapi && window.gapi.client) {
@@ -42,6 +63,18 @@ const withApis = (Comp) => {
       }
     };
 
+    checkIfSoundcloudSdkExists = () => {
+      if (window.SC) {
+        this.initSoundcloud();
+        this.setState({ soundcloudSdkLoaded: true });
+        clearInterval(this.soundcloudSdkLoader);
+      }
+    };
+
+    initSoundcloud = () => {
+      window.SC.initialize({ client_id: SOUNDCLOUD_CLIENT_ID });
+    };
+
     loadYoutubeApi = () => {
       window.gapi.client.load('youtube', 'v3', () => {
         window.gapi.client.setApiKey(GOOGLE_API_KEY);
@@ -50,8 +83,16 @@ const withApis = (Comp) => {
     };
 
     render() {
-      const { youtubeApiLoaded, youtubePlayerLoaded } = this.state;
-      const ready = youtubeApiLoaded && youtubePlayerLoaded;
+      const {
+        youtubeApiLoaded,
+        youtubePlayerLoaded,
+        soundcloudSdkLoaded,
+      } = this.state;
+
+      const ready =
+        youtubeApiLoaded &&
+        youtubePlayerLoaded &&
+        soundcloudSdkLoaded;
 
       if (!ready) return null;
       

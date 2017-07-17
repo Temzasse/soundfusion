@@ -26,16 +26,8 @@ const propTypes = {
 
 class App extends Component {
   componentDidMount() {
-    // Do general initialization: load playlists etc...
+    // Do general initialization: load playlists, setup players etc...
     this.props.initApp();
-
-    // We now have access to the player APIs so create the different player objs
-    const ytPlayer = new window.YT.Player('yt-player', {
-      height: '360',
-      width: '640',
-    });
-
-    this.props.setPlayer({ name: 'youtube', player: ytPlayer });
   }
 
   render() {

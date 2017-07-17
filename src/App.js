@@ -85,7 +85,7 @@ const ContentWrapper = styled.div`
   overflow-y: auto;
   background: linear-gradient(
     to bottom,
-    ${props => props.theme.primaryColorDark} 0%,
+    ${props => props.theme.primaryColor} 0%,
     ${props => props.theme.primaryColorDarker} 100%
   );
 `;
@@ -102,7 +102,7 @@ const BottomBar = styled.div`
   align-items: center;
   background: linear-gradient(
     to right,
-    ${props => props.theme.primaryColor} 0%,
+    ${props => props.theme.primaryLighterBaseColor.darken(0.7).rgb().string()} 0%,
     ${props => props.theme.primaryColorDark} 100%
   );
 `;

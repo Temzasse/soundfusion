@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -21,11 +21,7 @@ const propTypes = {
   createPlaylist: PropTypes.func.isRequired,
 };
 
-class PlaylistsContainer extends Component {
-  state = {
-
-  }
-
+class PlaylistsContainer extends PureComponent {
   render() {
     const { playlists, activePlaylist } = this.props;
     

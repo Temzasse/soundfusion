@@ -23,7 +23,7 @@ const PlaylistItem = ({ name, handleDelete, handleClick, active }) => (
 
 const ItemWrapper = styled.div`
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: 18px;
   display: flex;
 `;
 const Name = styled.div`

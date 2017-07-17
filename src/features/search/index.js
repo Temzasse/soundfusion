@@ -26,6 +26,7 @@ class SearchContainer extends Component {
     resultsVisible: false,
     resultsFocused: false,
     selectedTrack: null,
+    trackAdded: false,
   }
 
   selectTrack = track => {
@@ -35,6 +36,7 @@ class SearchContainer extends Component {
   handleTermChange = ({ target }) => {
     const searchTerm = target.value;
     this.props.updateSearchTerm(searchTerm);
+    this.resetSelectedTrack();
   }
 
   showResults = () => {
@@ -57,10 +59,13 @@ class SearchContainer extends Component {
   addTrackToPlaylist = playlist => {
     const { selectedTrack } = this.state;
     this.props.addTrackToPlaylist({ track: selectedTrack, playlist });
+    this.setState({ trackAdded: true }, () => {
+      setTimeout(() => this.setState({ trackAdded: false }), 2000);
+    });
   }
 
   render() {
-    const { resultsVisible, selectedTrack } = this.state;
+    const { resultsVisible, selectedTrack, trackAdded } = this.state;
     const { searchTerm, isSearching, searchResults, playlists } = this.props;
 
     return (
@@ -99,6 +104,12 @@ class SearchContainer extends Component {
                 />
               </Panel>
             </PanelSlider>
+
+            {trackAdded &&
+              <TrackAdded>
+                Track added to playlist!
+              </TrackAdded>
+            }
           </SearchResultsWrapper>
         }
       </SearchWrapper>
@@ -122,7 +133,7 @@ const SearchWrapper = styled.div`
   position: relative;
 `;
 const SearchInput = styled.input`
-  width: 300px;
+  width: 400px;
   border-radius: 4px;
   border: none;
   color: #222;
@@ -134,17 +145,16 @@ const SearchInput = styled.input`
 const SearchResultsWrapper = styled.div`
   min-height: 200px;
   max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   border-radius: 8px;
   position: absolute;
   top: 50px;
   left: 16px;
   right: 16px;
-  box-shadow: 4px 8px 20px rgba(0,0,0,0.4);
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.6);
   color: #fff;
   outline: none;
-  background-color: ${props => props.theme.primaryColorDarkest};
+  background-color: ${props => props.theme.primaryColorDarker};
   animation: ${fadeUp} 0.3s;
 `;
 const Loading = styled.div`
@@ -156,12 +166,28 @@ const PanelSlider = styled.div`
   display: flex;
   flex-direction: row;
   transition: transform 0.3s cubic-bezier(.05,.83,.56,.89);
-  transform: translateX(${props => props.animateToRight ? '-332px' : '0px'});
+  transform: translateX(${props => props.animateToRight ? '-432px' : '0px'});
 `;
 const Panel = styled.div`
-  width: 332px;
+  width: 432px;
+  overflow-y: auto;
   flex: none;
 `;
+const TrackAdded = styled.div`
+  animation: ${fadeUp} 0.3s;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  height: 50px;
+  background-color: ${props => props.theme.primaryColor};
+`;
+
 
 SearchContainer.propTypes = propTypes;
 

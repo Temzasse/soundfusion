@@ -15,7 +15,7 @@ const NavbarWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  background-color: ${props => props.theme.primaryColorDark};
+  background-color: ${props => props.theme.primaryColor};
 `;
 
 export default Navbar;

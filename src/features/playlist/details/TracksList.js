@@ -6,28 +6,45 @@ const propTypes = {
   tracks: PropTypes.array.isRequired,
   playTrack: PropTypes.func.isRequired,
   playlistId: PropTypes.string.isRequired,
+  isPlaying: PropTypes.bool.isRequired,
+  currentTrack: PropTypes.object,
 };
 
-const TracksList = ({ tracks, playTrack, playlistId }) => (
+const TracksList = ({
+  tracks,
+  playTrack,
+  playlistId,
+  isPlaying,
+  currentTrack,
+}) =>
   <TracksListWrapper>
     <TracksHeader>
+      <Status />
       <Title>Track</Title>
       <Artist>Artist / Uploader</Artist>
     </TracksHeader>
 
     <Tracks>
-      {tracks.map((track, index) => (
+      {tracks.map((track, index) =>
         <TrackRow
           onClick={() => playTrack({ track, index, playlistId })}
           key={track.id}
         >
-          <Title>{track.title}</Title>
-          <Artist>{track.artist}</Artist>
+          <Status>
+            {(isPlaying && currentTrack.track.id === track.id) &&
+              <PlayingIcon className="mdi mdi-volume-high" />
+            }
+          </Status>
+          <Title>
+            {track.title}
+          </Title>
+          <Artist>
+            {track.artist}
+          </Artist>
         </TrackRow>
-      ))}
+      )}
     </Tracks>
-  </TracksListWrapper>
-);
+  </TracksListWrapper>;
 
 const TracksListWrapper = styled.div`
   display: flex;
@@ -44,12 +61,13 @@ const TrackRow = styled.li`
   display: flex;
   flex-direction: row;
   align-items: center;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid ${props => props.theme.primaryColorDarkest};
   color: #fff;
   font-size: 14px;
+  cursor: default;
 
   &:hover {
-    color: ${props => props.theme.primaryColorLightest}
+    color: ${props => props.theme.primaryColorLight};
   }
 `;
 const TracksHeader = styled.div`
@@ -65,6 +83,18 @@ const Title = styled.div`
 const Artist = styled.div`
   flex: 2;
 `;
+const Status = styled.div`
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const PlayingIcon = styled.i`
+  font-size: 18px;
+  color: ${props => props.theme.primaryColorLight};
+`;
+
+
 
 TracksList.propTypes = propTypes;
 

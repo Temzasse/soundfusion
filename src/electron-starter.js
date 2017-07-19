@@ -34,6 +34,34 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+  // FIX: Youtube IFrame API UMG issue
+  electron.session.defaultSession.webRequest.onBeforeSendHeaders([
+    'https://*.youtube.com/*'
+  ], (details, callback) => {
+    details.requestHeaders['Accept-Language'] = 'en';
+    details.requestHeaders['Referer'] = 'https://www.youtube.com/embed/?enablejsapi=1&origin=http%3A%2F%2Flocalhost%3A3000&widgetid=1';
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
+
+  electron.session.defaultSession.webRequest.onBeforeRequest([
+    'https://*.youtube.com/*'
+  ], (details, callback) => {
+    let newUrl;
+
+    if (
+      details.url.includes('video_info') &&
+      !details.url.includes('localhost')
+    ) {
+      newUrl = new url.URL(details.url);
+      newUrl.searchParams.set('eurl', 'http://localhost:3000/');
+    }
+
+    const response = newUrl
+      ? { cancel: false, redirectURL: newUrl.href }
+      : {};
+
+    callback(response);
+  });
 }
 
 // This method will be called when Electron has finished

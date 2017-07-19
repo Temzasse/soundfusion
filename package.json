@@ -1,11 +1,15 @@
 {
-  "name": "Awesomefy",
-  "version": "0.1.0",
+  "name": "sound-fusion",
+  "productName": "SoundFusion",
+  "author": "Teemu Taskula",
+  "version": "1.0.0",
+  "description": "A music player app that combines tracks from multiple sources",
   "private": true,
   "main": "./src/electron-starter.js",
   "homepage": "./",
   "devDependencies": {
     "electron": "1.6.10",
+    "electron-builder": "19.16.0",
     "react-scripts": "1.0.7"
   },
   "dependencies": {
@@ -30,6 +34,19 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
-    "electron-dev:w": "set ELECTRON_START_URL=http://localhost:3000 && electron ."
-  }
+    "electron-dev:win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "prepackage": "npm run build",
+    "package": "build"
+  },
+  "build": {
+    "appId": "com.Taskula.SoundFusion",
+    "files": "!build-resources${*/}",
+    "directories": {
+      "buildResources": "./build-resources"
+    },
+    "mac": {
+      "category": "public.app-category.music"
+    }
+  },
+  "license": "ISC"
 }

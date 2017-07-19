@@ -74,7 +74,6 @@ function * setTrackSaga({ payload }) {
 
     // Reset current player if there's a track playing
     const currentPlayer = yield select(getCurrentPlayer);
-    console.log('=>', currentPlayer);
     if (currentPlayer) currentPlayer.reset();
 
     // Re-dispatch the correct action that changes the store

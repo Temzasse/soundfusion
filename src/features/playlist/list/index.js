@@ -54,10 +54,6 @@ const PlaylistsWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const ControlIcon = styled.i`
-  font-size: 18px;
-  color: #fff;
-`;
 const Playlists = styled.ul`
   list-style: none;
   padding: 0;

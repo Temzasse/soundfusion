@@ -36,8 +36,6 @@ no_connection: when we failed to connect to an endpoint due to missing transport
 
 */
 
-import { SOUNDCLOUD_CLIENT_ID } from '../constants';
-
 export default class SouncloudPlayer {
   constructor() {
     this.player = null;

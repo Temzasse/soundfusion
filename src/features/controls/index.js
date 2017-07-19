@@ -151,15 +151,6 @@ const ControlIcon = styled.i`
   }
 `;
 
-const Search = styled.input`
-  font-size: 16px;
-  color: #222;
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
-  border-radius: 6px;
-`;
-
 ControlsContainer.propTypes = propTypes;
 
 function mapStateToProps(state) {

@@ -16,6 +16,7 @@ import Navbar from './views/Navbar';
 import CurrentPlaylist from './features/playlist/details';
 import Controls from './features/controls';
 import TrackDetails from './features/track/details';
+import Zen from './features/zen';
 
 const propTypes = {
   setPlayer: PropTypes.func.isRequired,
@@ -25,18 +26,30 @@ const propTypes = {
 };
 
 class App extends Component {
+  state = {
+    zenMode: false,
+  }
+
   componentDidMount() {
     // Do general initialization: load playlists, setup players etc...
     this.props.initApp();
   }
 
+  toggleZenMode = () => {
+    this.setState(prevState => ({
+      zenMode: !prevState.zenMode,
+    }));
+  }
+
   render() {
     const { appReady, activePlaylist } = this.props;
+    const { zenMode } = this.state;
 
     if (!appReady) return <div>Ladataan...</div>;
 
     return (
       <AppWrapper className="App">
+        {zenMode && <Zen onHide={this.toggleZenMode} />}
         <MainWrapper>
           <Sidebar />
 
@@ -53,8 +66,10 @@ class App extends Component {
 
         <BottomBar>
           <TrackDetails />
-          <Controls />
-          <div style={{ width: 300 }} />
+          <Controls/>
+          <ZenBlock>
+            <OpenZen onClick={this.toggleZenMode}>Zen Mode</OpenZen>
+          </ZenBlock>
         </BottomBar>
       </AppWrapper>
     );
@@ -105,6 +120,20 @@ const BottomBar = styled.div`
     ${props => props.theme.primaryLighterBaseColor.darken(0.7).rgb().string()} 0%,
     ${props => props.theme.primaryColorDark} 100%
   );
+`;
+const ZenBlock = styled.div`
+  width: 300px;
+  padding: 0px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+const OpenZen = styled.button`
+  border: none;
+  padding: 8px 16px;
+  color: ${props => props.theme.primaryColorLightest};
+  background-color: ${props => props.theme.primaryColor};
+  border-radius: 12px;
 `;
 
 App.propTypes = propTypes;

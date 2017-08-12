@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { GOOGLE_API_KEY, SOUNDCLOUD_CLIENT_ID } from '../constants';
+import { GOOGLE_API_KEY, SOUNDCLOUD_CLIENT_ID } from '../config';
 
 const withApis = (Comp) => {
   return class ApiProvider extends Component {

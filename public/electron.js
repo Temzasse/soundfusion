@@ -2,6 +2,7 @@ const electron = require('electron')
 const path = require('path')
 const url = require('url')
 const { setMenu } = require('./electron-menu');
+const isDev = require('electron-is-dev');
 
 // Module to control application life.
 const app = electron.app
@@ -30,7 +31,7 @@ function createWindow () {
   mainWindow.loadURL(startUrl);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  if (isDev) mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', function () {
     mainWindow.show();

@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "A music player app that combines tracks from multiple sources",
   "private": true,
-  "main": "./src/electron-starter.js",
+  "main": "public/electron.js",
   "homepage": "./",
   "devDependencies": {
     "concurrently": "3.5.0",
@@ -45,9 +45,12 @@
   },
   "build": {
     "appId": "com.Taskula.SoundFusion",
-    "files": "!build-resources${*/}",
+    "files": [
+      "build/**/*",
+      "assets/icon.*"
+    ],
     "directories": {
-      "buildResources": "./build-resources"
+      "buildResources": "assets"
     },
     "mac": {
       "category": "public.app-category.music"

@@ -2,7 +2,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Nunito', sans-serif;
+  overflow: hidden;
 }
+
 #yt-player {
   height: 0px;
   width: 0px;

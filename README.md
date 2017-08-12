@@ -14,19 +14,26 @@ The idea for this app was born from the desire to learn [Electron](https://githu
 
 ---
 
-## Installation
+## Usage
 
-Clone this repo:
+You can download the app directly:
+
+**Mac OSX**: [zip](https://drive.google.com/file/d/0B8bjZk24z5UGU2YwRWpIX0tGcnc/view?usp=sharing) | [dmg](https://drive.google.com/file/d/0B8bjZk24z5UGeTVzSkI5YmRkZUE/view?usp=sharing)
+
+**Windows**: TODO...
+
+Or if you fancy more hands-on installation process then first clone this repo:
 ```
 $ git clone git@github.com:Temzasse/soundfusion.git
 ```
 
-You can try the development version by following the **Development** section below.
+Then install dependencies and package the app:
+```
+$ npm install
+$ npm run pack
+```
 
-Or you can build the "production" version:
-```
-$ TODO
-```
+After [electron-builder](https://github.com/electron-userland/electron-builder) is ready you will find the app under *dist/mac/SoundFusion*.
 
 ## Development
 
@@ -35,21 +42,15 @@ Install dependencies:
 $ npm install
 ```
 
-Then start the Webpack dev server:
+Run app in dev mode:
 ```
-$ npm start
-```
-
-And after that has fired up start electron:
-```
-$ npm run electron-dev
+$ npm run dev
 ```
 
 And if you are on Windows:
 ```
-$ npm run electron-dev:win
+$ npm run dev:win
 ```
 
 ## TODO
-- Getting dev setup up and running should not require two commands.
 - Add more music sources (check out [Bandcamp](https://bandcamp.com/developer)).

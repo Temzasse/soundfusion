@@ -8,6 +8,10 @@ SoundFusion is a music player app that finds tracks from various sources to crea
 
 The idea for this app was born from the desire to learn [Electron](https://github.com/electron/electron) and build my first desktop app ever.
 
+<p align='center'>
+  <img src="media/screenshot_1.png" width="100%"/>
+<p/>
+
 ---
 
 ## Installation

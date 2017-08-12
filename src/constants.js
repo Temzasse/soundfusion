@@ -24,6 +24,3 @@ export const theme = {
   primaryColorDarker,
   primaryColorDarkest,
 };
-
-export const GOOGLE_API_KEY = '***REMOVED***';
-export const SOUNDCLOUD_CLIENT_ID = '***REMOVED***';

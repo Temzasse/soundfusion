@@ -5,6 +5,8 @@ import {
   normalizeSoundcloudResults
 } from './utils';
 
+const MAX_RESULTS = 8;
+
 async function searchTracks(term) {
   const youtubeResults = await searchYoutube(term);
   const soundcloudResults = await searchSoundcloud(term);
@@ -12,26 +14,36 @@ async function searchTracks(term) {
 }
 
 async function searchYoutube(term) {
-  const youtubeSearch = getYoutubeSearchApi();
-  const { result } = await youtubeSearch.list({
-    q: term,
-    part: 'snippet',
-    type: 'video',
-    videoCategoryId: 10, // 10 -> MUSIC
-    maxResults: 5,
-  });
+  try {
+    const youtubeSearch = getYoutubeSearchApi();
+    const { result } = await youtubeSearch.list({
+      q: term,
+      part: 'snippet',
+      type: 'video',
+      videoCategoryId: 10, // 10 -> MUSIC
+      maxResults: MAX_RESULTS,
+    });
 
-  return normalizeYoutubeResults(result);
+    return normalizeYoutubeResults(result);
+  } catch (e) {
+    console.log('Youtube search failed', e);
+    return [];
+  }
 }
 
 async function searchSoundcloud(term) {
-  const soundcloudSearch = getSoundcloudSearchApi();
-  const result = await soundcloudSearch.get('/tracks', {
-    q: term,
-    limit: 5,
-  });
+  try {
+    const soundcloudSearch = getSoundcloudSearchApi();
+    const result = await soundcloudSearch.get('/tracks', {
+      q: term,
+      limit: MAX_RESULTS,
+    });
 
-  return normalizeSoundcloudResults(result);
+    return normalizeSoundcloudResults(result);
+  } catch(e) {
+    console.log('Soundcloud search failed', e);
+    return [];
+  }
 }
 
 export default searchTracks;

@@ -144,8 +144,9 @@ const SearchInput = styled.input`
 `;
 const SearchResultsWrapper = styled.div`
   min-height: 200px;
-  max-height: 80vh;
-  overflow: hidden;
+  max-height: 85vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 8px;
   position: absolute;
   top: 50px;
@@ -156,6 +157,7 @@ const SearchResultsWrapper = styled.div`
   outline: none;
   background-color: ${props => props.theme.primaryColorDarker};
   animation: ${fadeUp} 0.3s;
+  z-index: 999;
 `;
 const Loading = styled.div`
   font-size: 14px;

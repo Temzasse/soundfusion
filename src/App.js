@@ -3,16 +3,17 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import logo from './logo.svg';
 
 // Actions
 import { setPlayer } from './features/player/player.ducks';
 import { getActivePlaylist } from './features/playlist/playlist.ducks';
 import { initApp, getInitStatus } from './init/init.ducks';
 
-// Components, views
+// Components
 import withApis from './init/withApis';
-import Sidebar from './views/Sidebar';
-import Navbar from './views/Navbar';
+import Search from './features/search';
+import Playlists from './features/playlist/list';
 import CurrentPlaylist from './features/playlist/details';
 import Controls from './features/controls';
 import TrackDetails from './features/track/details';
@@ -25,6 +26,7 @@ const propTypes = {
   activePlaylist: PropTypes.object,
 };
 
+// TODO: move `zenMode` to Redux store
 class App extends Component {
   state = {
     zenMode: false,
@@ -50,11 +52,21 @@ class App extends Component {
     return (
       <AppWrapper className="App">
         {zenMode && <Zen onHide={this.toggleZenMode} />}
+
         <MainWrapper>
-          <Sidebar />
+          <Sidebar>
+            <TitleBar>
+              <Logo src={logo} />
+              SoundFusion
+            </TitleBar>
+            <Playlists />
+          </Sidebar>
 
           <MainContent>
-            <Navbar />
+            <Navbar>
+              <Search />
+            </Navbar>
+
             <ContentWrapper>
               {activePlaylist ?
                 <CurrentPlaylist /> :
@@ -108,6 +120,13 @@ const NoActivePlaylist = styled.h4`
   font-size: 24px;
   margin: 16px;
 `;
+const Navbar = styled.div`
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: ${props => props.theme.primaryColor};
+`;
 const BottomBar = styled.div`
   height: 100px;
   color: #fff;
@@ -120,6 +139,31 @@ const BottomBar = styled.div`
     ${props => props.theme.primaryLighterBaseColor.darken(0.7).rgb().string()} 0%,
     ${props => props.theme.primaryColorDark} 100%
   );
+`;
+const Sidebar = styled.div`
+  width: 300px;
+  background-color: ${props => props.theme.primaryColorDarkest};
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+`;
+
+const TitleBar = styled.div`
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0px 16px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 200;
+  color: #fff;
+  background-color: ${props => props.theme.primaryColorDark};
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  width: auto;
+  margin-right: 12px;
 `;
 const ZenBlock = styled.div`
   width: 300px;

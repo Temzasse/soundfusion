@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { GOOGLE_API_KEY, SOUNDCLOUD_CLIENT_ID } from '../config';
+import config from '../config';
 
 const withApis = (Comp) => {
   return class ApiProvider extends Component {
@@ -72,12 +72,12 @@ const withApis = (Comp) => {
     };
 
     initSoundcloud = () => {
-      window.SC.initialize({ client_id: SOUNDCLOUD_CLIENT_ID });
+      window.SC.initialize({ client_id: config.SOUNDCLOUD_CLIENT_ID });
     };
 
     loadYoutubeApi = () => {
       window.gapi.client.load('youtube', 'v3', () => {
-        window.gapi.client.setApiKey(GOOGLE_API_KEY);
+        window.gapi.client.setApiKey(config.GOOGLE_API_KEY);
         this.setState({ youtubeApiLoaded: true });
       });
     };

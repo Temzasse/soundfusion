@@ -1,10 +1,10 @@
 import PouchDB from 'pouchdb';
 
-window.PouchDB = PouchDB; // for PouchDB dev tools
+if (process.env.NODE_ENV !== 'production') {
+  window.PouchDB = PouchDB; // for PouchDB dev tools
+}
 
 const playlistDB = new PouchDB('playlist');
-// const trackDB = new PouchDB('track');
-// const userDB = new PouchDB('user');
 
 // Helper
 function normalizePlaylist(playlist) {

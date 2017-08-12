@@ -8,35 +8,40 @@
   "main": "./src/electron-starter.js",
   "homepage": "./",
   "devDependencies": {
-    "electron": "1.6.10",
-    "electron-builder": "19.16.0",
-    "react-scripts": "1.0.7"
+    "concurrently": "3.5.0",
+    "electron": "1.7.5",
+    "electron-builder": "19.20.1",
+    "react-scripts": "1.0.11",
+    "wait-on": "2.0.2"
   },
   "dependencies": {
     "color": "1.0.3",
-    "immutability-helper": "2.2.3",
-    "pouchdb": "6.2.0",
+    "electron-is-dev": "0.3.0",
+    "immutability-helper": "2.3.1",
+    "pouchdb": "6.3.4",
     "prop-types": "15.5.10",
-    "react": "15.5.4",
-    "react-dom": "15.5.4",
-    "react-redux": "5.0.5",
-    "react-router-dom": "4.1.1",
-    "redux": "3.6.0",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-redux": "5.0.6",
+    "react-router-dom": "4.1.2",
+    "redux": "3.7.2",
     "redux-actions": "2.2.1",
     "redux-logger": "3.0.6",
-    "redux-saga": "0.15.4",
-    "styled-components": "2.0.0"
+    "redux-saga": "0.15.6",
+    "styled-components": "2.1.2"
   },
   "scripts": {
+    "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && npm run electron:dev\"",
+    "dev:win": "concurrently \"set BROWSER=none npm start\" \"wait-on http://localhost:3000 && npm run electron:dev\"",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
-    "electron-dev:win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
-    "prepackage": "npm run build",
-    "package": "build"
+    "electron:dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
+    "electron:dev:win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "pack": "npm run build && electron-builder --em.main=build/electron.js",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.Taskula.SoundFusion",

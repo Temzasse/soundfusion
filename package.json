@@ -9,8 +9,10 @@
   "homepage": "./",
   "devDependencies": {
     "concurrently": "3.5.0",
+    "devtron": "1.4.0",
     "electron": "1.7.5",
     "electron-builder": "19.20.1",
+    "electron-debug": "1.4.0",
     "react-scripts": "1.0.11",
     "wait-on": "2.0.2"
   },

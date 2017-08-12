@@ -1,8 +1,11 @@
 const electron = require('electron')
 const path = require('path')
 const url = require('url')
+// const isDev = require('electron-is-dev');
 const { setMenu } = require('./electron-menu');
-const isDev = require('electron-is-dev');
+
+// Open the DevTools.
+require('electron-debug')({ showDevTools: true });
 
 // Module to control application life.
 const app = electron.app
@@ -29,9 +32,6 @@ function createWindow () {
   });
   
   mainWindow.loadURL(startUrl);
-
-  // Open the DevTools.
-  if (isDev) mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', function () {
     mainWindow.show();

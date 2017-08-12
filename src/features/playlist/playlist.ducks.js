@@ -11,11 +11,12 @@ import {
   createPlaylist as createPlaylistDB,
   listPlaylistTracks as listPlaylistTracksDB,
   addTrackToPlaylist as addTrackToPlaylistDB,
+  removeTrackFromPlaylist as removeTrackFromPlaylistDB,
 } from '../../services/db';
 
 // Action types
 export const PLAYLIST = createTypes('PLAYLIST', [
-  ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK',
+  ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK', 'REMOVE_TRACK',
 ]);
 
 // Export actions
@@ -26,6 +27,7 @@ export const updatePlaylist = createAction(PLAYLIST.UPDATE);
 export const listPlaylists = createAction(PLAYLIST.LIST);
 export const setActivePlaylist = createAction(PLAYLIST.SET_ACTIVE);
 export const addTrackToPlaylist = createAction(PLAYLIST.ADD_TRACK);
+export const removeTrackFromPlaylist = createAction(PLAYLIST.REMOVE_TRACK);
 
 // Reducers
 const initialState = {
@@ -62,6 +64,16 @@ export default function reducer(state = initialState, action = {}) {
       playlistsById: {
         [action.payload.playlist._id]: {
           tracks: { $push: [action.payload.track.id] },
+        }
+      },
+    });
+  case PLAYLIST.REMOVE_TRACK:
+    return update(state, {
+      playlistsById: {
+        [action.payload.playlistId]: {
+          tracks: { $apply: currentTracks =>
+            currentTracks.filter(x => x !== action.payload.trackId)
+          },
         }
       },
     });
@@ -129,10 +141,18 @@ function * setActiveSaga({ payload: id }) {
 function * addTrackSaga({ payload }) {
   try {
     const { playlist, track } = payload;
-    // Add track to playlist in db first
     yield addTrackToPlaylistDB(track, playlist._id);
   } catch (e) {
     console.debug('[addTrackSaga error]', e);
+  }
+}
+
+function * removeTrackSaga({ payload }) {
+  try {
+    const { playlistId, trackId } = payload;
+    yield removeTrackFromPlaylistDB(trackId, playlistId);
+  } catch (e) {
+    console.debug('[removeTrackSaga error]', e);
   }
 }
 
@@ -149,10 +169,14 @@ function * watchActivation() {
 function * watchAddTrack() {
   yield takeEvery(PLAYLIST.ADD_TRACK, addTrackSaga);
 }
+function * watchRemoveTrack() {
+  yield takeEvery(PLAYLIST.REMOVE_TRACK, removeTrackSaga);
+}
 
 export function * playlistSagas() {
   yield fork(watchDelete);
   yield fork(watchCreate);
   yield fork(watchActivation);
   yield fork(watchAddTrack);
+  yield fork(watchRemoveTrack);
 }

@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
 const playlistDB = new PouchDB('playlist');
 
 // Helper
-function normalizePlaylist(playlist) {
+function formatPlaylist(playlist) {
   return {
     ...playlist,
     tracks: playlist.tracks.map(t => t.id), // Just return the track ids
@@ -46,16 +46,19 @@ export async function addTrackToPlaylist(track, playlistId) {
 
   await playlistDB.put(playlist); // Put back to db
 
-  return normalizePlaylist(playlist);
+  return formatPlaylist(playlist);
 };
 
-export async function removeTrackFromPlaylist(trackIndex, playlistId) {
+export async function removeTrackFromPlaylist(trackId, playlistId) {
   const playlist = await playlistDB.get(playlistId);
 
+  console.log('1', playlist);
   // Remove track
-  playlist.tracks.splice(trackIndex, 1);
+  playlist.tracks = playlist.tracks.filter(x => x.id !== trackId);
+
+  console.log('2', playlist);
   
   await playlistDB.put(playlist); // Put back to db
   
-  return normalizePlaylist(playlist);
+  return formatPlaylist(playlist);
 };

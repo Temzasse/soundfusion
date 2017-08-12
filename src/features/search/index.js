@@ -59,6 +59,8 @@ class SearchContainer extends Component {
   addTrackToPlaylist = playlist => {
     const { selectedTrack } = this.state;
     this.props.addTrackToPlaylist({ track: selectedTrack, playlist });
+
+    // Animate toast to verify that track was added
     this.setState({ trackAdded: true }, () => {
       setTimeout(() => this.setState({ trackAdded: false }), 2000);
     });

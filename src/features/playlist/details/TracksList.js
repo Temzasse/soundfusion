@@ -4,9 +4,10 @@ import styled from 'styled-components';
 
 const propTypes = {
   tracks: PropTypes.array.isRequired,
-  playTrack: PropTypes.func.isRequired,
   playlistId: PropTypes.string.isRequired,
   isPlaying: PropTypes.bool.isRequired,
+  playTrack: PropTypes.func.isRequired,
+  removeTrack: PropTypes.func.isRequired,
   currentTrack: PropTypes.object,
 };
 
@@ -16,6 +17,7 @@ const TracksList = ({
   playlistId,
   isPlaying,
   currentTrack,
+  removeTrack,
 }) =>
   <TracksListWrapper>
     <TracksHeader>
@@ -26,21 +28,22 @@ const TracksList = ({
 
     <Tracks>
       {tracks.map((track, index) =>
-        <TrackRow
-          onClick={() => playTrack({ track, index, playlistId })}
-          key={track.id}
-        >
+        <TrackRow key={track.id}>
           <Status>
             {(isPlaying && currentTrack.track.id === track.id) &&
               <PlayingIcon className="mdi mdi-volume-high" />
             }
           </Status>
-          <Title>
+          <Title onClick={() => playTrack({ track, index, playlistId })}>
             {track.title}
           </Title>
-          <Artist>
+          <Artist onClick={() => playTrack({ track, index, playlistId })}>
             {track.artist}
           </Artist>
+          <RemoveIcon
+            className="mdi mdi-close-circle"
+            onClick={() => removeTrack(track.id)}
+          />
         </TrackRow>
       )}
     </Tracks>
@@ -93,8 +96,14 @@ const PlayingIcon = styled.i`
   font-size: 18px;
   color: ${props => props.theme.primaryColorLight};
 `;
+const RemoveIcon = styled.i`
+  font-size: 16px;
+  opacity: 0.2;
 
-
+  &:hover {
+    opacity: 1;
+  }
+`;
 
 TracksList.propTypes = propTypes;
 

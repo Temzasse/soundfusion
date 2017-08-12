@@ -12,6 +12,8 @@ import {
   getPlayingStatus,
 } from '../../player/player.ducks';
 
+import { removeTrackFromPlaylist } from '../playlist.ducks';
+
 // Components
 import TracksList from './TracksList';
 
@@ -23,6 +25,14 @@ const propTypes = {
 };
 
 class PlaylistDetailsContainer extends PureComponent {
+  removeTrackFromPlaylist = (trackId) => {
+    const { playlist } = this.props;
+    this.props.removeTrackFromPlaylist({
+      playlistId: playlist._id,
+      trackId,
+    });
+  }
+
   render() {
     const { playlist, playlistTracks, isPlaying, currentTrack } = this.props;
 
@@ -39,9 +49,10 @@ class PlaylistDetailsContainer extends PureComponent {
             <TracksList
               tracks={playlistTracks}
               playlistId={playlist._id}
-              playTrack={this.props.setTrack}
               isPlaying={isPlaying}
               currentTrack={currentTrack}
+              playTrack={this.props.setTrack}
+              removeTrack={this.removeTrackFromPlaylist}
             /> :
             <div>Add tracks by searching them with the input above.</div>
           }
@@ -93,6 +104,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setTrack,
+    removeTrackFromPlaylist,
   }, dispatch)
 }
 

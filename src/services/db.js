@@ -52,11 +52,8 @@ export async function addTrackToPlaylist(track, playlistId) {
 export async function removeTrackFromPlaylist(trackId, playlistId) {
   const playlist = await playlistDB.get(playlistId);
 
-  console.log('1', playlist);
   // Remove track
   playlist.tracks = playlist.tracks.filter(x => x.id !== trackId);
-
-  console.log('2', playlist);
   
   await playlistDB.put(playlist); // Put back to db
   

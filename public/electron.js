@@ -1,11 +1,13 @@
 const electron = require('electron')
 const path = require('path')
 const url = require('url')
-// const isDev = require('electron-is-dev');
+const isDev = require('electron-is-dev');
 const { setMenu } = require('./electron-menu');
 
 // Open the DevTools.
-require('electron-debug')({ showDevTools: true });
+if (isDev) {
+  require('electron-debug')({ showDevTools: true });
+}
 
 // Module to control application life.
 const app = electron.app

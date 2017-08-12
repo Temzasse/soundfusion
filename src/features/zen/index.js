@@ -32,63 +32,33 @@ const randomColor = () => {
 class Zen extends Component {
   state = {
     bars: 90,
-    update: null,
   }
-
-  // shouldComponentUpdate() {
-  //   return false;
-  // }
-
-  // componentDidMount() {
-  //   this.loop = setInterval(() => {
-  //     this.setState({ update: true });
-  //   }, 10000);
-  // }
 
   render() {
     const { bars } = this.state;
+
     return (
       <ZenWrapper onClick={this.props.onHide}>
         <Graphics>
           {range(bars).map(i =>
             <Bar
+              x='50%'
+              y='50%'
               len={bars}
               rot={i}
               width={randomInBetween(2, 7)}
               height={randomInBetween(40, 50)}
               fill={randomColor()}
-              x='50%'
-              y='50%'
               delay={randomInBetween(0, 4)}
+              key={`bar_${i}`}
             />          
           )}
-           <Circle
-            cx={'50%'}
-            cy={'50%'}
-            r={140}
-            fill={primaryColorDarkest}
-          />
-          <Circle
-            cx={'50%'}
-            cy={'50%'}
-            r={100}
-            fill={primaryColorDarker}
-            pulse
-          />
-          <Circle
-            cx={'50%'}
-            cy={'50%'}
-            r={50}
-            fill={primaryColorDark}
-            pulse
-          />
-          <Circle
-            cx={'50%'}
-            cy={'50%'}
-            r={20}
-            fill={primaryColor}
-            pulse
-          />
+          {/* eslint-disable max-len */}
+          <Circle cx={'50%'} cy={'50%'} r={140} fill={primaryColorDarkest} />
+          <Circle cx={'50%'} cy={'50%'} r={100} fill={primaryColorDarker} pulse />
+          <Circle cx={'50%'} cy={'50%'} r={50} fill={primaryColorDark} pulse />
+          <Circle cx={'50%'} cy={'50%'} r={20} fill={primaryColor} pulse />
+          {/* eslint-enable max-len */}
         </Graphics>
       </ZenWrapper>
     );
@@ -106,6 +76,7 @@ const pulsate = keyframes`
   100% { transform: scale(1.2, 1.2); opacity: 0.3; }
 `;
 
+// TODO: is there a way not to repeat three first transforms?
 const barAnim = props => keyframes`
   0% {
     transform:

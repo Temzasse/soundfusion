@@ -11,13 +11,14 @@ SoundFusion is a music player app that finds tracks from various sources to crea
 <p/>
 
 The idea for this app was born from the desire to learn [Electron](https://github.com/electron/electron) and build my first desktop app ever.
+
 ---
 
 ## Usage
 
 You can download the app directly:
 
-**Mac OSX**: [zip](https://drive.google.com/file/d/0B8bjZk24z5UGU2YwRWpIX0tGcnc/view?usp=sharing) | [dmg](https://drive.google.com/file/d/0B8bjZk24z5UGeTVzSkI5YmRkZUE/view?usp=sharing)
+**Mac OSX**: [zip](https://s3.eu-central-1.amazonaws.com/soundfusion/SoundFusion-1.0.0-mac.zip) | [dmg](https://s3.eu-central-1.amazonaws.com/soundfusion/SoundFusion-1.0.0.dmg)
 
 **Windows**: TODO...
 
@@ -43,6 +44,8 @@ $ npm run pack
 
 After [electron-builder](https://github.com/electron-userland/electron-builder) is ready you will find the app under *dist* folder.
 
+>**Disclaimer:** YouTube doesn't allow using videos as music without showing the actual video. I might try to add the video element somewhere but at the moment this is purely a personal project for learning Electron and I feel that things are fine as they are.
+
 ## Development
 
 Install dependencies:
@@ -65,6 +68,14 @@ $ npm run dev:win
 **NOTE:** the app will most likely crash without valid API keys...
 
 ## TODO
-- Allow using only one of the sources if some of the API keys are missing / invalid
-- App should not crash if one of the sources does not work
+
+### Fixes
+- Allow using only one of the sources if some of the API keys are missing / invalid.
+- App should not crash if one of the sources does not work.
+
+### Features
+- Shuffle.
+- Volume control.
+- Rename playlist.
 - Add more music sources (check out [Bandcamp](https://bandcamp.com/developer)).
+- Feature suggestions are more than welcome :)

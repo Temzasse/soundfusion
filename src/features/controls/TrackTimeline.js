@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { primaryColorLight } from '../../constants';
 
 const propTypes = {
   something: PropTypes.any,
@@ -38,9 +39,22 @@ const TrackTimeline = ({
       min="0"
       max={Math.floor(duration)}
       value={Math.floor(currentTime)}
-      percentage={Math.round(currentTime / duration * 1000) / 1000}
       onChange={({ target }) => handleTimeChange(target.value)}
       onInput={({ target }) => handleTimeSlide(target.value)}
+      style={{
+        backgroundImage: `-webkit-gradient(
+          linear,
+          left top,
+          right top,
+          color-stop(
+            ${Math.round(currentTime / duration * 1000) / 1000},
+            ${primaryColorLight}
+          ),
+          color-stop(
+            ${Math.round(currentTime / duration * 1000) / 1000},
+            #fff
+          )
+      )`}}
     />
     <TrackTime>{formatTime(Math.floor(duration))}</TrackTime>
   </TrackTimelineWrapper>
@@ -64,19 +78,6 @@ const TrackDuration = styled.input`
   border-radius: 3px;
   outline: none;
   padding: 0;
-  background-image: -webkit-gradient(
-      linear,
-      left top,
-      right top,
-      color-stop(
-        ${props => props.percentage},
-        ${props => props.theme.primaryColorLight}
-      ),
-      color-stop(
-        ${props => props.percentage},
-        #fff
-      )
-  );
 
   &:focus {
     outline: none;

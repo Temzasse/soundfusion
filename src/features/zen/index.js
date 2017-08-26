@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled, { keyframes, css } from 'styled-components';
 import {
@@ -12,6 +12,7 @@ import {
 
 const propTypes = {
   onHide: PropTypes.func.isRequired,
+  visible: PropTypes.bool.isRequired,
 };
 
 const range = num => [...Array(num).keys()];
@@ -29,29 +30,43 @@ const randomColor = () => {
   ][randomInBetween(0, 4)];
 };
 
-class Zen extends Component {
-  state = {
-    bars: 90,
+class Zen extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    const numOfBars = 70;
+
+    this.state = {
+      bars: range(numOfBars).map(x => ({
+        fill: randomColor(),
+        width: randomInBetween(2, 7),
+        height: randomInBetween(40, 50),
+        rot: 360 / numOfBars * x,
+        delay: randomInBetween(0, 4),
+        id: `bar_${x}`
+      })),
+    };
   }
 
   render() {
     const { bars } = this.state;
+    const { visible } = this.props;
 
     return (
-      <ZenWrapper onClick={this.props.onHide}>
+      <ZenWrapper onClick={this.props.onHide} visible={visible}>
         <Graphics>
-          {range(bars).map(i =>
-            <Bar
-              x='50%'
-              y='50%'
-              len={bars}
-              rot={i}
-              width={randomInBetween(2, 7)}
-              height={randomInBetween(40, 50)}
-              fill={randomColor()}
-              delay={randomInBetween(0, 4)}
-              key={`bar_${i}`}
-            />          
+          {bars.map(bar =>
+            <Bar key={bar.id} delay={bar.delay}>
+              <BarFiller
+                fill={bar.fill}
+                len={bars}
+                rot={bar.rot}
+                width={bar.width}
+                height={bar.height}
+                x='50%'
+                y='50%'
+              />
+            </Bar>          
           )}
           {/* eslint-disable max-len */}
           <Circle cx={'50%'} cy={'50%'} r={140} fill={primaryColorDarkest} />
@@ -60,6 +75,56 @@ class Zen extends Component {
           <Circle cx={'50%'} cy={'50%'} r={20} fill={primaryColor} pulse />
           {/* eslint-enable max-len */}
         </Graphics>
+        <Bg>
+          <Circle
+            cx={'30%'}
+            cy={'40%'}
+            r={10}
+            fill={primaryColor}
+            pulse
+            delay={3}
+          />
+          <Circle
+            cx={'70%'}
+            cy={'40%'}
+            r={12}
+            fill={primaryColorDarker}
+            pulse
+            delay={2}
+          />
+          <Circle
+            cx={'80%'}
+            cy={'20%'}
+            r={14}
+            fill={primaryColor}
+            pulse
+            delay={1.2}
+          />
+          <Circle
+            cx={'20%'}
+            cy={'70%'}
+            r={10}
+            fill={primaryColor}
+            pulse
+            delay={0.5}
+          />
+          <Circle
+            cx={'10%'}
+            cy={'30%'}
+            r={7}
+            fill={primaryColorDark}
+            pulse
+            delay={0.2}
+          />
+          <Circle
+            cx={'80%'}
+            cy={'70%'}
+            r={18}
+            fill={primaryColorDarker}
+            pulse
+            delay={2.2}
+          />
+        </Bg>
       </ZenWrapper>
     );
   }
@@ -76,43 +141,12 @@ const pulsate = keyframes`
   100% { transform: scale(1.2, 1.2); opacity: 0.3; }
 `;
 
-// TODO: is there a way not to repeat three first transforms?
-const barAnim = props => keyframes`
-  0% {
-    transform:
-      translate(-50%, -50%)
-      rotate(${`${360 / props.len * props.rot}deg`})
-      translate(0px, ${`${props.height / 2 + 100}px`})
-      scale(1, 1);
-  }
-  25% {
-    transform:
-      translate(-50%, -50%)
-      rotate(${`${360 / props.len * props.rot}deg`})
-      translate(0px, ${`${props.height / 2 + 100}px`})
-      scale(1, 2.2);
-  }
-  50% {
-    transform:
-      translate(-50%, -50%)
-      rotate(${`${360 / props.len * props.rot}deg`})
-      translate(0px, ${`${props.height / 2 + 100}px`})
-      scale(1, 0.5);
-  }
-  75% {
-    transform:
-      translate(-50%, -50%)
-      rotate(${`${360 / props.len * props.rot}deg`})
-      translate(0px, ${`${props.height / 2 + 100}px`})
-      scale(1, 1.5);
-  }
-  100% {
-    transform:
-      translate(-50%, -50%)
-      rotate(${`${360 / props.len * props.rot}deg`})
-      translate(0px, ${`${props.height / 2 + 100}px`})
-      scale(1, 1);
-  }
+const barAnim = keyframes`
+  0% { transform: scale(1); }
+  25% { transform: scale(2); }
+  50% { transform: scale(0.5); }
+  75% { transform: scale(1.5); }
+  100% { transform: scale(1); }
 `;
 
 const ZenWrapper = styled.div`
@@ -126,12 +160,22 @@ const ZenWrapper = styled.div`
   justify-content: center;
   background-color: ${props => props.theme.primaryColorDarkest};
   z-index: 999999999;
+  ${props => !props.visible && css`
+    display: none;
+  `}
+`;
+const Bg = styled.svg`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
 `;
 const Graphics = styled.svg`
   width: 800px;
   height: 800px;
   will-change: transform;
   animation: ${rotAnim} 10s infinite ease-out;
+  z-index: 2;
 `;
 const Circle = styled.circle`
   transform-origin: center center;
@@ -141,19 +185,21 @@ const Circle = styled.circle`
     animation-delay: ${props => props.delay || 0}s;
   `}
 `;
-const Bar = styled.rect`
+const BarFiller = styled.rect`
   z-index: 9999999999;
-  will-change: transform;
   transform-origin: center center;
   transform: ${props => css`
     translate(-50%, -50%)
-    rotate(${`${360 / props.len * props.rot}deg`})
+    rotate(${`${props.rot}deg`})
     translate(0px, ${`${props.height / 2 + 100}px`});
   `}
+`;
+const Bar = styled.g`
+  transform-origin: center center;
   animation: ${props => css`
     ${barAnim} 1.4s ease infinite
   `};
-  animation-delay: ${props => props.delay}s;
+  animation-delay: ${props => props.delay || 0}s;
 `;
 
 Zen.propTypes = propTypes;

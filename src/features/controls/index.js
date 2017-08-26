@@ -15,6 +15,8 @@ import {
   getCurrentTrack,
 } from '../player/player.ducks';
 
+import { getShuffleStatus, toggleShuffle } from '../playlist/playlist.ducks';
+
 // Components
 import TrackTimeline from './TrackTimeline';
 
@@ -27,6 +29,8 @@ const propTypes = {
   isPlaying: PropTypes.bool.isRequired,
   currentPlayer: PropTypes.object,
   currentTrack: PropTypes.object,
+  shuffleEnabled: PropTypes.bool.isRequired,
+  toggleShuffle: PropTypes.func.isRequired,
 };
 
 class ControlsContainer extends Component {
@@ -59,20 +63,24 @@ class ControlsContainer extends Component {
   }
 
   updateTrackTimeline = () => {
-    const { isPlaying, currentPlayer } = this.props;
+    try {
+      const { isPlaying, currentPlayer } = this.props;
 
-    // Only update timeline if track is playing
-    if (isPlaying && !!currentPlayer) {      
-      const currentTime = currentPlayer.getCurrentTime();
-      const duration = currentPlayer.getDuration();
+      // Only update timeline if track is playing
+      if (isPlaying && !!currentPlayer) {      
+        const currentTime = currentPlayer.getCurrentTime();
+        const duration = currentPlayer.getDuration();
 
-      this.setState({ currentTime, duration });
+        this.setState({ currentTime, duration });
 
-      const trackAlmostDone =
-        (currentTime > 0 && duration > 0) &&
-        (currentTime > (duration - 2));
+        const trackAlmostDone =
+          (currentTime > 0 && duration > 0) &&
+          (currentTime > (duration - 2));
 
-      if (trackAlmostDone) this.props.nextTrack();
+        if (trackAlmostDone) this.props.nextTrack();
+      }  
+    } catch (error) {
+      console.log('Could not update track time', error);
     }
   }
 
@@ -81,12 +89,18 @@ class ControlsContainer extends Component {
   }
 
   render() {
-    const { isPlaying, currentTrack } = this.props;
+    const { isPlaying, currentTrack, shuffleEnabled } = this.props;
     const { currentTime, duration } = this.state;
 
     return (
       <ControlsWrapper>
         <Controls>
+          <ControlIcon
+            className="mdi mdi-shuffle-variant"
+            active={shuffleEnabled}
+            onClick={() => this.props.toggleShuffle()}
+            size="16px"
+          />
           <ControlIcon
             className="mdi mdi-skip-previous"
             onClick={() => this.props.prevTrack()}
@@ -107,6 +121,11 @@ class ControlsContainer extends Component {
           <ControlIcon
             className="mdi mdi-skip-next"
             onClick={() => this.props.nextTrack()}
+          />
+          <ControlIcon
+            className="mdi mdi-volume-off"
+            onClick={() => console.log('mute')}
+            size="16px"
           />
         </Controls>
 
@@ -140,7 +159,7 @@ const Controls = styled.div`
 
 const ControlIcon = styled.i`
   font-size: ${props => props.size || '24px'};
-  color: #fff;
+  color: ${props => props.active ? props.theme.primaryColorLight: '#fff'};
   margin: 0 16px;
   opacity: 0.6;
   transition: transform 0.2s ease, opacity 0.3s ease-in;
@@ -158,6 +177,7 @@ function mapStateToProps(state) {
     isPlaying: getPlayingStatus(state),
     currentPlayer: getCurrentPlayer(state),
     currentTrack: getCurrentTrack(state),
+    shuffleEnabled: getShuffleStatus(state),
   };
 }
 
@@ -169,6 +189,7 @@ function mapDispatchToProps(dispatch) {
       nextTrack,
       prevTrack,
       setTrackTime,
+      toggleShuffle,
     },
     dispatch
   );

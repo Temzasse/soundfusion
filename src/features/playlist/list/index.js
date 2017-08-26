@@ -10,11 +10,13 @@ import {
   setActivePlaylist,
   getPlaylists,
   getActivePlaylist,
+  renamePlaylist,
 } from '../playlist.ducks';
 
 // Components
 import CreatePlaylist from './CreatePlaylist';
 import PlaylistItem from './PlaylistItem';
+import RenameInput from './RenameInput';
 
 const propTypes = {
   deletePlaylist: PropTypes.func.isRequired,
@@ -22,8 +24,28 @@ const propTypes = {
 };
 
 class PlaylistsContainer extends PureComponent {
+  state = {
+    playlistToRename: null,
+  }
+
+  toggleRename = playlistId => {
+    this.setState({ playlistToRename: playlistId });
+  };
+
+  renamePlaylist = newName => {
+    const { playlistToRename } = this.state;
+
+    this.props.renamePlaylist({
+      id: playlistToRename,
+      name: newName,
+    });
+
+    this.toggleRename(null);
+  };
+
   render() {
     const { playlists, activePlaylist } = this.props;
+    const { playlistToRename } = this.state;
     
     return (
       <PlaylistsWrapper>
@@ -32,18 +54,25 @@ class PlaylistsContainer extends PureComponent {
         />
 
         <Playlists>
-          {playlists.length > 0 ?
+          {playlists.length > 0 &&
             playlists.map(({ name, _id }) => (
-              <PlaylistItem
-                key={_id}
-                name={name}
-                active={!!activePlaylist && (activePlaylist._id === _id)}
-                handleDelete={() => this.props.deletePlaylist(_id)}
-                handleClick={() => this.props.setActivePlaylist(_id)}
-              />
-            )) :
-            <NoPlaylists>You don't have any playlists yet</NoPlaylists>
-          }
+              playlistToRename !== _id ?
+                <PlaylistItem
+                  key={_id}
+                  name={name}
+                  active={!!activePlaylist && (activePlaylist._id === _id)}
+                  handleDelete={() => this.props.deletePlaylist(_id)}
+                  handleRename={() => this.toggleRename(_id)}
+                  handleClick={() => this.props.setActivePlaylist(_id)}
+                /> :
+                <RenameInput
+                  onConfirm={this.renamePlaylist}
+                  onCancel={() => this.toggleRename(null)}
+                />
+            ))}
+          
+          {!playlists.length &&
+            <NoPlaylists>You don't have any playlists yet</NoPlaylists>}
         </Playlists>
       </PlaylistsWrapper>
     );
@@ -78,6 +107,7 @@ function mapDispatchToProps(dispatch) {
     createPlaylist,
     deletePlaylist,
     setActivePlaylist,
+    renamePlaylist,
   }, dispatch)
 }
 

@@ -91,8 +91,6 @@ const TypeIcon = styled.i`
   color: #fff;
 `;
 
-
-
 SearchResults.propTypes = propTypes;
 
 export default SearchResults;

@@ -27,6 +27,12 @@ export async function createPlaylist(name) {
   return playlist;
 };
 
+export async function renamePlaylist(id, newName) {
+  const playlist = await playlistDB.get(id);
+  playlist.name = newName;
+  await playlistDB.put(playlist);
+};
+
 export async function listPlaylists() {
   const { rows } = await playlistDB.allDocs({ include_docs: true });
   const playlists = rows.map(({ doc }) => doc);

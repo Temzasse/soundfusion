@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
+import { fadeUp } from '../../common/animations';
 
 import {
   updateSearchTerm,
@@ -119,17 +120,6 @@ class SearchContainer extends Component {
   }
 }
 
-const fadeUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0px);
-  }
-`;
-
 const SearchWrapper = styled.div`
   display: flex;
   position: relative;
@@ -158,7 +148,7 @@ const SearchResultsWrapper = styled.div`
   color: #fff;
   outline: none;
   background-color: ${props => props.theme.primaryColorDarker};
-  animation: ${fadeUp} 0.3s;
+  animation: ${fadeUp()} 0.3s;
   z-index: 999;
 `;
 const Loading = styled.div`
@@ -192,7 +182,6 @@ const TrackAdded = styled.div`
   background-color: ${props => props.theme.primaryColor};
 `;
 
-
 SearchContainer.propTypes = propTypes;
 
 function mapStateToProps(state) {
@@ -215,19 +204,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(SearchContainer);
-
-// handleSearch = ({ target }) => {
-//   const searchTerm = target.value;
-
-//   this.setState({ searchTerm });
-
-//   if (searchTerm.length > 3) {
-//     this.props.youtubeApi.search.list({
-//       q: searchTerm,
-//       part: 'snippet',
-//     }).execute(({ result }) => {
-//       const video = result.items[0];
-//       this.loadVideo(video.id.videoId);
-//     });
-//   }
-// };

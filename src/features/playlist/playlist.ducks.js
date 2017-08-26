@@ -12,11 +12,13 @@ import {
   listPlaylistTracks as listPlaylistTracksDB,
   addTrackToPlaylist as addTrackToPlaylistDB,
   removeTrackFromPlaylist as removeTrackFromPlaylistDB,
+  renamePlaylist as renamePlaylistDB,
 } from '../../services/db';
 
 // Action types
 export const PLAYLIST = createTypes('PLAYLIST', [
   ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK', 'REMOVE_TRACK',
+  'RENAME',
 ]);
 
 // Export actions
@@ -28,6 +30,7 @@ export const listPlaylists = createAction(PLAYLIST.LIST);
 export const setActivePlaylist = createAction(PLAYLIST.SET_ACTIVE);
 export const addTrackToPlaylist = createAction(PLAYLIST.ADD_TRACK);
 export const removeTrackFromPlaylist = createAction(PLAYLIST.REMOVE_TRACK);
+export const renamePlaylist = createAction(PLAYLIST.RENAME);
 
 // Reducers
 const initialState = {
@@ -77,6 +80,15 @@ export default function reducer(state = initialState, action = {}) {
         }
       },
     });
+  case PLAYLIST.RENAME: {
+    const { id, name } = action.payload;
+    const playlist = state.playlistsById[id];
+    return update(state, {
+      playlistsById: {
+        [id]: { $set: { ...playlist, name } },
+      },
+    });
+  }
   default: return state;
   }
 }
@@ -156,6 +168,15 @@ function * removeTrackSaga({ payload }) {
   }
 }
 
+function * renamePlaylistSaga({ payload }) {
+  try {
+    const { id, name } = payload;
+    yield renamePlaylistDB(id, name);
+  } catch (e) {
+    console.debug('[renamePlaylistSaga error]', e);
+  }
+}
+
 // Saga watchers
 function * watchDelete() {
   yield takeEvery(PLAYLIST.DELETE, deletePlaylistSaga);
@@ -172,6 +193,9 @@ function * watchAddTrack() {
 function * watchRemoveTrack() {
   yield takeEvery(PLAYLIST.REMOVE_TRACK, removeTrackSaga);
 }
+function * watchRenamePlaylist() {
+  yield takeEvery(PLAYLIST.RENAME, renamePlaylistSaga);
+}
 
 export function * playlistSagas() {
   yield fork(watchDelete);
@@ -179,4 +203,5 @@ export function * playlistSagas() {
   yield fork(watchActivation);
   yield fork(watchAddTrack);
   yield fork(watchRemoveTrack);
+  yield fork(watchRenamePlaylist);
 }

@@ -70,10 +70,12 @@ $ npm run dev:win
 ## TODO
 
 ### Fixes
+
 - Allow using only one of the sources if some of the API keys are missing / invalid.
 - App should not crash if one of the sources does not work.
 
 ### Features
+
 - Shuffle.
 - Volume control.
 - Rename playlist.

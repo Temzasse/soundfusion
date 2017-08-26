@@ -107,10 +107,10 @@ function * playSaga() {
 function * pauseSaga() {
   try {
     const currentTrack = yield select(getCurrentTrack);
+
     if (!currentTrack) return; // early exit
 
-    const trackType = currentTrack.track.type;
-    const player = yield select(getPlayerByName, trackType);
+    const player = yield select(getPlayerByName, currentTrack.track.type);
 
     player.pause();
   } catch (e) {
@@ -128,6 +128,7 @@ function * nextTrackSaga() {
       currentTrack.playlistId,
       currentTrack.index
     );
+
     if (!nextTrack) return; // early exit
 
     yield put(setTrack({
@@ -150,6 +151,7 @@ function * prevTrackSaga() {
       currentTrack.playlistId,
       currentTrack.index
     );
+
     if (!prevTrack) return; // early exit
 
     yield put(setTrack({

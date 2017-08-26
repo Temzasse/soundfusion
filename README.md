@@ -78,6 +78,5 @@ $ npm run dev:win
 
 - Shuffle.
 - Volume control.
-- Rename playlist.
 - Add more music sources (check out [Bandcamp](https://bandcamp.com/developer)).
 - Feature suggestions are more than welcome :)

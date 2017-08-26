@@ -28,7 +28,6 @@ const initialState = {
   isPlaying: false,
   players: {
     youtube: null,
-    spotify: null,
     soundcloud: null,
   }
 };

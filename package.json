@@ -44,7 +44,8 @@
     "electron:dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
     "electron:dev:win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
     "pack": "npm run build && electron-builder --em.main=build/electron.js",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "clean:install": "rm -rf node_modules && npm install"
   },
   "build": {
     "appId": "com.Taskula.SoundFusion",

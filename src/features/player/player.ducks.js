@@ -1,6 +1,5 @@
 import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
-// import { delay } from 'redux-saga';
 import { fork, takeEvery, takeLatest, select, put } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
 import { getNextTrack, getPrevTrack } from '../playlist/playlist.ducks';
@@ -8,7 +7,7 @@ import { getNextTrack, getPrevTrack } from '../playlist/playlist.ducks';
 // Action types
 export const PLAYER = createTypes('PLAYER', [
   'PLAY', 'PAUSE', 'PREV_TRACK', 'NEXT_TRACK', 'SET_PLAYER', 'SET_TRACK',
-  'SET_CURRENT_PLAYER', 'SET_TRACK_TIME', 'SET_CURRENT_TRACK',
+  'SET_CURRENT_PLAYER', 'SET_TRACK_TIME', 'SET_CURRENT_TRACK', 'TOGGLE_MUTE'
 ]);
 
 // Export actions
@@ -21,11 +20,13 @@ export const setCurrentTrack = createAction(PLAYER.SET_CURRENT_TRACK);
 export const setPlayer = createAction(PLAYER.SET_PLAYER);
 export const setCurrentPlayer = createAction(PLAYER.SET_CURRENT_PLAYER);
 export const setTrackTime = createAction(PLAYER.SET_TRACK_TIME);
+export const toggleMute = createAction(PLAYER.TOGGLE_MUTE);
 
 // Reducers
 const initialState = {
   currentTrack: null,
   isPlaying: false,
+  isMuted: false,
   players: {
     youtube: null,
     soundcloud: null,
@@ -51,6 +52,10 @@ export default function reducer(state = initialState, action = {}) {
     return update(state, {
       isPlaying: { $set: false },
     });
+  case PLAYER.TOGGLE_MUTE:
+    return update(state, {
+      isMuted: { $set: !state.isMuted },
+    });
   default: return state;
   }
 }
@@ -60,6 +65,7 @@ export default function reducer(state = initialState, action = {}) {
 export const getPlayingStatus = ({ player }) => player.isPlaying;
 export const getPlayerByName = (state, name) => state.player.players[name];
 export const getCurrentTrack = ({ player }) => player.currentTrack;
+export const getMuteStatus = ({ player }) => player.isMuted;
 export const getCurrentPlayer = ({ player }) => {
   if (!player.currentTrack) return null;
   return player.players[player.currentTrack.track.type];
@@ -167,13 +173,26 @@ function * setTrackTimeSaga({ payload: newTime }) {
   try {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
-
-    const trackType = currentTrack.track.type;
-    const player = yield select(getPlayerByName, trackType);
+    const player = yield select(getPlayerByName, currentTrack.track.type);
 
     player.seek(newTime);
   } catch (e) {
     console.debug('[pauseSaga] error', e);
+  }
+}
+
+function * toggleMuteSaga() {
+  try {
+    const currentTrack = yield select(getCurrentTrack);
+    if (!currentTrack) return; // early exit
+    const player = yield select(getPlayerByName, currentTrack.track.type);
+    const isMuted = yield select(getMuteStatus);
+
+    // NOTE: this happens after the store has been updated!
+    if (isMuted) player.mute();
+    else player.unMute();
+  } catch(e) {
+    console.debug('[toggleMuteSaga] error', e);
   }
 }
 
@@ -196,6 +215,9 @@ function * watchSetTrack() {
 function * watchSetTrackTime() {
   yield takeLatest(PLAYER.SET_TRACK_TIME, setTrackTimeSaga);
 }
+function * watchMuteToggle() {
+  yield takeLatest(PLAYER.TOGGLE_MUTE, toggleMuteSaga);
+}
 
 export function * playerSagas() {
   yield fork(watchPlay);
@@ -204,4 +226,5 @@ export function * playerSagas() {
   yield fork(watchPrevTrack);
   yield fork(watchSetTrack);
   yield fork(watchSetTrackTime);
+  yield fork(watchMuteToggle);
 }

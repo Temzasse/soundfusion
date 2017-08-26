@@ -6,6 +6,14 @@ export default class YoutubePlayer {
     });
   }
 
+  mute = () => {
+    this.player.mute();
+  };
+
+  unMute = () => {
+    this.player.unMute();
+  };
+
   play = () => {
     this.player.playVideo();
   };

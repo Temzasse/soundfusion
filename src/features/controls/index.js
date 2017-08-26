@@ -13,6 +13,8 @@ import {
   getPlayingStatus,
   getCurrentPlayer,
   getCurrentTrack,
+  toggleMute,
+  getMuteStatus,
 } from '../player/player.ducks';
 
 import { getShuffleStatus, toggleShuffle } from '../playlist/playlist.ducks';
@@ -31,6 +33,8 @@ const propTypes = {
   currentTrack: PropTypes.object,
   shuffleEnabled: PropTypes.bool.isRequired,
   toggleShuffle: PropTypes.func.isRequired,
+  toggleMute: PropTypes.func.isRequired,
+  isMuted: PropTypes.bool.isRequired,
 };
 
 class ControlsContainer extends Component {
@@ -89,7 +93,7 @@ class ControlsContainer extends Component {
   }
 
   render() {
-    const { isPlaying, currentTrack, shuffleEnabled } = this.props;
+    const { isPlaying, currentTrack, shuffleEnabled, isMuted } = this.props;
     const { currentTime, duration } = this.state;
 
     return (
@@ -123,8 +127,8 @@ class ControlsContainer extends Component {
             onClick={() => this.props.nextTrack()}
           />
           <ControlIcon
-            className="mdi mdi-volume-off"
-            onClick={() => console.log('mute')}
+            className={`mdi mdi-volume-${isMuted ? 'off' : 'high'}`}
+            onClick={this.props.toggleMute}
             size="16px"
           />
         </Controls>
@@ -178,6 +182,7 @@ function mapStateToProps(state) {
     currentPlayer: getCurrentPlayer(state),
     currentTrack: getCurrentTrack(state),
     shuffleEnabled: getShuffleStatus(state),
+    isMuted: getMuteStatus(state),
   };
 }
 
@@ -190,6 +195,7 @@ function mapDispatchToProps(dispatch) {
       prevTrack,
       setTrackTime,
       toggleShuffle,
+      toggleMute,
     },
     dispatch
   );

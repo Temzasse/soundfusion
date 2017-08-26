@@ -20,13 +20,8 @@ import { PLAYER } from '../player/player.ducks';
 
 // Action types
 export const PLAYLIST = createTypes('PLAYLIST', [
-<<<<<<< HEAD
   ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK', 'REMOVE_TRACK',
-  'RENAME',
-=======
-  ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK', 'TOGGLE_SHUFFLE',
-  'ADD_SHUFFLED', 'RESET_SHUFFLED',
->>>>>>> Added initial shuffle implementation
+  'RENAME', 'TOGGLE_SHUFFLE', 'ADD_SHUFFLED', 'RESET_SHUFFLED',
 ]);
 
 // Export actions
@@ -37,14 +32,11 @@ export const updatePlaylist = createAction(PLAYLIST.UPDATE);
 export const listPlaylists = createAction(PLAYLIST.LIST);
 export const setActivePlaylist = createAction(PLAYLIST.SET_ACTIVE);
 export const addTrackToPlaylist = createAction(PLAYLIST.ADD_TRACK);
-<<<<<<< HEAD
 export const removeTrackFromPlaylist = createAction(PLAYLIST.REMOVE_TRACK);
 export const renamePlaylist = createAction(PLAYLIST.RENAME);
-=======
 export const toggleShuffle = createAction(PLAYLIST.TOGGLE_SHUFFLE);
 export const addShuffledTrack = createAction(PLAYLIST.ADD_SHUFFLED);
 export const resetShuffled = createAction(PLAYLIST.RESET_SHUFFLED);
->>>>>>> Added initial shuffle implementation
 
 // Reducers
 const initialState = {
@@ -113,13 +105,9 @@ export default function reducer(state = initialState, action = {}) {
         : state.shuffledTracks,
       },
     });
-  /*case PLAYER.SET_TRACK:
-    return update(state, {
-      shuffledTracks: { $set: action.payload.track
-        ? [] // reset already shuffled tracks when shuffle is disabled
-        : state.shuffledTracks,
-      },
-    });*/
+  // When a new track is selected we always reset the shuffle array
+  case PLAYER.SET_TRACK:
+    return update(state, { shuffledTracks: [] });
   default: return state;
   }
 }

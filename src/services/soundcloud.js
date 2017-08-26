@@ -42,6 +42,14 @@ export default class SouncloudPlayer {
     this.currentTrack = null;
   }
 
+  mute = () => {
+    this.player.setVolume(0);
+  };
+
+  unMute = () => {
+    this.player.setVolume(100);
+  };
+
   play = () => {
     this.player.play();
   };

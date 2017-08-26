@@ -51,8 +51,7 @@ class App extends Component {
 
     return (
       <AppWrapper className="App">
-        {zenMode && <Zen onHide={this.toggleZenMode} />}
-
+        <Zen onHide={this.toggleZenMode} visible={zenMode} />
         <MainWrapper>
           <Sidebar>
             <TitleBar>

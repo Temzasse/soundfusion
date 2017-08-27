@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
-import { fork, takeEvery, put } from 'redux-saga/effects';
+import { fork, takeEvery, put, select } from 'redux-saga/effects';
 import _ from 'lodash';
 
 import { createTypes, crudActions } from '../../common/reduxHelpers';
@@ -16,12 +16,12 @@ import {
   renamePlaylist as renamePlaylistDB,
 } from '../../services/db';
 
-import { PLAYER } from '../player/player.ducks';
+import { PLAYER, getCurrentTrack } from '../player/player.ducks';
 
 // Action types
 export const PLAYLIST = createTypes('PLAYLIST', [
   ...crudActions, 'INIT', 'SET_ACTIVE', 'ADD_TRACK', 'REMOVE_TRACK',
-  'RENAME', 'TOGGLE_SHUFFLE', 'ADD_SHUFFLED', 'RESET_SHUFFLED',
+  'RENAME', 'TOGGLE_SHUFFLE', 'PUSH_SHUFFLED', 'POP_SHUFFLED', 'RESET_SHUFFLED',
 ]);
 
 // Export actions
@@ -35,7 +35,8 @@ export const addTrackToPlaylist = createAction(PLAYLIST.ADD_TRACK);
 export const removeTrackFromPlaylist = createAction(PLAYLIST.REMOVE_TRACK);
 export const renamePlaylist = createAction(PLAYLIST.RENAME);
 export const toggleShuffle = createAction(PLAYLIST.TOGGLE_SHUFFLE);
-export const addShuffledTrack = createAction(PLAYLIST.ADD_SHUFFLED);
+export const pushShuffledTrack = createAction(PLAYLIST.PUSH_SHUFFLED);
+export const popShuffledTrack = createAction(PLAYLIST.POP_SHUFFLED);
 export const resetShuffled = createAction(PLAYLIST.RESET_SHUFFLED);
 
 // Reducers
@@ -105,17 +106,25 @@ export default function reducer(state = initialState, action = {}) {
         : state.shuffledTracks,
       },
     });
+  case PLAYLIST.PUSH_SHUFFLED:
+    return update(state, {
+      shuffledTracks: { $push: [action.payload] },
+    });
+  case PLAYLIST.POP_SHUFFLED:
+    return update(state, {
+      shuffledTracks: { $splice: [[-1, 1]] }, // remove last
+    });
   // When a new track is selected we always reset the shuffle array
-  case PLAYER.SET_TRACK:
-    return update(state, { shuffledTracks: [] });
+  case PLAYLIST.RESET_SHUFFLED:
+    return update(state, { shuffledTracks: { $set: [] } });
   default: return state;
   }
 }
 
 // Helpers
-const getRandomTrack = (allTracks, shuffledTracks) => {
-  const tracksToPick = _.difference(allTracks, shuffledTracks);
-  return tracksToPick[_.random(tracksToPick.length)];
+const getRandomTrack = (playlistTracks, shuffledTracks) => {
+  const tracksToPick = _.difference(playlistTracks, shuffledTracks);
+  return _.sample(tracksToPick);
 };
 
 // Selectors
@@ -139,26 +148,25 @@ export const getPlaylistTracks = ({ playlist, track }) => {
 export const getShuffleStatus = ({ playlist }) => playlist.shuffleEnabled;
 export const getShuffledTracks = ({ playlist }) => playlist.shuffleEnabled;
 
-export const getNextTrack = ({ playlist, track }, playlistId, trackIndex) => {
-  const currentPlaylist = playlist.playlistsById[playlistId];
+export const getNextTrack = ({ playlist, track }, trackData) => {
+  const { playlistId, track: currentTrack } = trackData;
   const { shuffledTracks, shuffleEnabled } = playlist;
-
+  const currentPlaylist = playlist.playlistsById[playlistId];
+  
   // For some reason the playlist doesnt exist...
   if (!currentPlaylist) return null;
 
+  const currentPlaylistLen = currentPlaylist.tracks.length;
+  
   // All tracks have been shuffled through
-  if (
-    shuffleEnabled &&
-    shuffledTracks.length + 1 === currentPlaylist.tracks.length
-  ) {
+  if (shuffleEnabled && shuffledTracks.length === currentPlaylistLen) {
     return null;
   }
 
+  const trackIndex = currentPlaylist.tracks.indexOf(currentTrack.id);
+
   // Current track is the last one in playlist
-  if (
-    !shuffleEnabled &&
-    currentPlaylist.tracks.length - 1 < trackIndex + 1
-  ) {
+  if (!shuffleEnabled && trackIndex === currentPlaylistLen - 1) {
     return null;
   }
 
@@ -171,14 +179,17 @@ export const getNextTrack = ({ playlist, track }, playlistId, trackIndex) => {
     nextTrackId = currentPlaylist.tracks[trackIndex + 1];
   }
 
-  return track.tracksById[nextTrackId];
+  return nextTrackId ? track.tracksById[nextTrackId] : null;
 };
 
-export const getPrevTrack = ({ playlist, track }, playlistId, trackIndex) => {
+export const getPrevTrack = ({ playlist, track }, trackData) => {
+  const { playlistId, track: currentTrack } = trackData;
   const currentPlaylist = playlist.playlistsById[playlistId];
-
+  
   // For some reason the playlist doesnt exist...
   if (!currentPlaylist) return null;
+  
+  const trackIndex = currentPlaylist.tracks.indexOf(currentTrack.id);
 
   // Current track is the first one in playlist
   if (trackIndex === 0) return null;
@@ -231,6 +242,15 @@ function * renamePlaylistSaga({ payload }) {
   }
 }
 
+function * handleShufflePlaylistSaga() {
+  const shuffleEnabled = yield select(getShuffleStatus);
+  const currentTrack = yield select(getCurrentTrack);
+
+  if (currentTrack && shuffleEnabled) {
+    yield put(pushShuffledTrack(currentTrack.track.id));
+  }
+}
+
 // Saga watchers
 function * watchDelete() {
   yield takeEvery(PLAYLIST.DELETE, deletePlaylistSaga);
@@ -250,6 +270,9 @@ function * watchRemoveTrack() {
 function * watchRenamePlaylist() {
   yield takeEvery(PLAYLIST.RENAME, renamePlaylistSaga);
 }
+function * watchShufflePlaylist() {
+  yield takeEvery(PLAYLIST.TOGGLE_SHUFFLE, handleShufflePlaylistSaga);
+}
 
 export function * playlistSagas() {
   yield fork(watchDelete);
@@ -258,4 +281,5 @@ export function * playlistSagas() {
   yield fork(watchAddTrack);
   yield fork(watchRemoveTrack);
   yield fork(watchRenamePlaylist);
+  yield fork(watchShufflePlaylist);
 }

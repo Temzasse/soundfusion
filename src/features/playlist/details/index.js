@@ -4,7 +4,11 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 
-import { getPlaylistTracks, getActivePlaylist } from '../playlist.ducks';
+import {
+  getPlaylistTracks,
+  getActivePlaylist,
+  resetShuffled,
+} from '../playlist.ducks';
 
 import {
   setTrack,
@@ -22,6 +26,9 @@ const propTypes = {
   playlistTracks: PropTypes.array.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   currentTrack: PropTypes.object,
+  setTrack: PropTypes.func.isRequired,
+  removeTrackFromPlaylist: PropTypes.func.isRequired,
+  resetShuffled: PropTypes.func.isRequired,
 };
 
 class PlaylistDetailsContainer extends PureComponent {
@@ -31,7 +38,14 @@ class PlaylistDetailsContainer extends PureComponent {
       playlistId: playlist._id,
       trackId,
     });
-  }
+  };
+
+  handleTrackClick = ({ track, index, playlistId }) => {
+    this.props.setTrack({ track, index, playlistId });
+    // Everytime we manually set a track we want to reset the shuffle array.
+    // TODO: we should add the track to shuffled array if shuffle is enabled.
+    this.props.resetShuffled();
+  };
 
   render() {
     const { playlist, playlistTracks, isPlaying, currentTrack } = this.props;
@@ -51,7 +65,7 @@ class PlaylistDetailsContainer extends PureComponent {
               playlistId={playlist._id}
               isPlaying={isPlaying}
               currentTrack={currentTrack}
-              playTrack={this.props.setTrack}
+              playTrack={this.handleTrackClick}
               removeTrack={this.removeTrackFromPlaylist}
             /> :
             <div>Add tracks by searching them with the input above.</div>
@@ -105,6 +119,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setTrack,
     removeTrackFromPlaylist,
+    resetShuffled,
   }, dispatch)
 }
 

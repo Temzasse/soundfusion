@@ -2,7 +2,13 @@ import update from 'immutability-helper';
 import { createAction } from 'redux-actions';
 import { fork, takeEvery, takeLatest, select, put } from 'redux-saga/effects';
 import { createTypes } from '../../common/reduxHelpers';
-import { getNextTrack, getPrevTrack } from '../playlist/playlist.ducks';
+import {
+  getNextTrack,
+  getPrevTrack,
+  getShuffleStatus,
+  pushShuffledTrack,
+  popShuffledTrack,
+} from '../playlist/playlist.ducks';
 
 // Action types
 export const PLAYER = createTypes('PLAYER', [
@@ -112,7 +118,6 @@ function * playSaga() {
 function * pauseSaga() {
   try {
     const currentTrack = yield select(getCurrentTrack);
-
     if (!currentTrack) return; // early exit
 
     const player = yield select(getPlayerByName, currentTrack.track.type);
@@ -127,20 +132,15 @@ function * nextTrackSaga() {
   try {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
-
-    const nextTrack = yield select(
-      getNextTrack,
-      currentTrack.playlistId,
-      currentTrack.index
-    );
-
+    
+    const nextTrack = yield select(getNextTrack, currentTrack);
     if (!nextTrack) return; // early exit
 
-    yield put(setTrack({
-      track: nextTrack,
-      playlistId: currentTrack.playlistId,
-      index: currentTrack.index + 1,
-    }));
+    // Push the track to the shuffle array
+    const shuffleEnabled = yield select(getShuffleStatus);
+    if (shuffleEnabled) yield put(pushShuffledTrack(nextTrack.id));
+
+    yield put(setTrack({ ...currentTrack, track: nextTrack }));
   } catch (e) {
     console.debug('[nextTrackSaga] error', e);
   }
@@ -151,19 +151,15 @@ function * prevTrackSaga() {
     const currentTrack = yield select(getCurrentTrack);
     if (!currentTrack) return; // early exit
 
-    const prevTrack = yield select(
-      getPrevTrack,
-      currentTrack.playlistId,
-      currentTrack.index
-    );
-
+    const prevTrack = yield select(getPrevTrack, currentTrack);
     if (!prevTrack) return; // early exit
 
-    yield put(setTrack({
-      track: prevTrack,
-      playlistId: currentTrack.playlistId,
-      index: currentTrack.index - 1,
-    }));
+    // Every time we go back we remove last track from shuffled array
+    // to keep the shuffle implementation simple.
+    const shuffleEnabled = yield select(getShuffleStatus);
+    if (shuffleEnabled) yield put(popShuffledTrack());
+
+    yield put(setTrack({ ...currentTrack, track: prevTrack }));
   } catch (e) {
     console.debug('[nextTrackSaga] error', e);
   }
